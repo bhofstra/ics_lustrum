@@ -1,6 +1,6 @@
-name: "Example Lab Journal"
+name: "ICS Lustrum 2026"
 author: 
-  - 'Your Name'
+  - 'Bas Hofstra'
 output_dir: "docs"
 exclude: 
   - "data"
@@ -10,10 +10,10 @@ navbar:
   left:
     - icon: fa-home
       href: index.html
-    - text: "My journal"
+    - text: "Data"
       menu:
-      - text: "Page 1"
-        href: lab1.html
+      - text: "Data cleaning"
+        href: data_cleaning.html
         
         # here, other .Rmds can be added
 

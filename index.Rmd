@@ -1,10 +1,10 @@
 ---
-title: "Lab journal"
+title: "ICS Lustrum 2026"
 output:
   html_document:
     toc: false
     number_sections: false
-author: "by: Your Name"
+author: "by: Bas Hofstra"
 bibliography: references.bib
 
 ---
@@ -43,19 +43,19 @@ klippy::klippy(position = c('top', 'right'))
 :::::::::::::: {.columns}
 ::: {.column width="50%"}
 
-# My Lab Journal
+# ICS Lustrum 2026!
+
 Last compiled on `r format(Sys.time(), '%B, %Y')`  
 
-*Describe lab journal here.*
+## Questions 
+
+- Gender diversity PhDs over time
+- Nationality diversity PhDs over time
+
 
 <br>
 
 ----
-
-
-Everyone can fork this repository. 
-
-Use this example to journal your lab work and assignments. 
 
 
 :::
@@ -73,7 +73,6 @@ Use this example to journal your lab work and assignments.
 
 
 ## How to use
-
 
 
 <br>
