@@ -50,6 +50,7 @@ groundhog.library("
                   library('igraph')
                   library('visNetwork')
                   library('gganimate')
+                  library('shiny')
                   ", 
                   "2025-04-10")
 
@@ -114,7 +115,7 @@ ggraph(g, layout = "fr") +
 
 # Nicer Viz
 
-```{r viz_shiny}
+```{r viz_nicer}
 
 # number of ties for info on hover
 node_count <- degree(g)
@@ -172,10 +173,123 @@ visNetwork(nodes, edges, height = "1000px", width = "100%") %>%
 )
 ```
 
+# Dynamic viz
+
+```{r viz_dyn}
+
+edges_all <- bind_rows(
+  t1 %>% mutate(time = "t1"),
+  t2 %>% mutate(time = "t2"),
+  t3 %>% mutate(time = "t3"),
+  t4 %>% mutate(time = "t4"),
+  t5 %>% mutate(time = "t5"),
+  t6 %>% mutate(time = "t6"),
+  t7 %>% mutate(time = "t7")
+)
+
+# edges_all must have: from, to, n, time
+
+# 1) Nodes and fixed layout from union graph
+nodes <- sort(unique(c(edges_all$from, edges_all$to)))
+
+g_all <- graph_from_data_frame(
+  edges_all %>% distinct(from, to),
+  directed = FALSE,
+  vertices = data.frame(name = nodes)
+)
+
+xy <- layout_with_fr(g_all)  # or layout_with_kk(g_all)
+nodes_df <- data.frame(
+  name = V(g_all)$name,
+  x = xy[, 1],
+  y = xy[, 2]
+)
+
+# 2) Edge coordinates per time
+edges_df <- edges_all %>%
+  left_join(nodes_df, by = c("from" = "name")) %>%
+  rename(x1 = x, y1 = y) %>%
+  left_join(nodes_df, by = c("to" = "name")) %>%
+  rename(x2 = x, y2 = y)
+
+# 3) Plot + animate
+p <- ggplot() +
+  geom_segment(
+    data = edges_df,
+    aes(x = x1, y = y1, xend = x2, yend = y2, linewidth = n),
+    alpha = 0.45,
+    colour = "grey60"
+  ) +
+  geom_point(
+    data = nodes_df,
+    aes(x = x, y = y),
+    size = 2
+  ) +
+  scale_linewidth(range = c(0.2, 3)) +
+  coord_equal() +
+  theme_void() +
+  labs(title = "Time: {closest_state}") +
+  transition_states(time, state_length = 1) +
+  ease_aes("linear")
+
+anim <- animate(p, fps = 10, width = 900, height = 700)
+anim
+
+```
+
+# Shiny viz
+
+```{r shiny, eval = FALSE}
 
 
+# ensure time is ordered t1 < t2 < ... < t7
+times <- sort(unique(edges_all$time))
+edges_all <- edges_all %>%
+  mutate(time = factor(time, levels = times, ordered = TRUE))
 
+all_nodes <- sort(unique(c(edges_all$from, edges_all$to)))
 
+ui <- fluidPage(
+  sliderInput("tt", "Time", min = 1, max = length(times), value = 1, step = 1,
+              animate = TRUE),
+  visNetworkOutput("net", height = "85vh")
+)
 
+server <- function(input, output, session) {
 
+  output$net <- renderVisNetwork({
 
+    # cumulative edges up to selected time
+    ed_cum <- edges_all %>%
+      filter(time <= times[input$tt]) %>%
+      group_by(from, to) %>%
+      summarise(n = max(n), .groups = "drop")   # keep strongest (or use sum(n) / last(n))
+
+    g_t <- graph_from_data_frame(ed_cum, directed = FALSE,
+                                vertices = data.frame(name = all_nodes))
+
+    nodes_v <- data.frame(
+      id    = V(g_t)$name,
+      label = "",            # no labels on canvas
+      title = V(g_t)$name    # hover shows label
+    )
+
+    e <- as_data_frame(g_t, what = "edges")
+    edges_v <- data.frame(
+      from  = e$from,
+      to    = e$to,
+      value = e$n,                 # edge width
+      title = paste0("n: ", e$n)   # hover edge shows n
+    )
+
+    visNetwork(nodes_v, edges_v) %>%
+      visInteraction(hover = TRUE) %>%
+      visOptions(highlightNearest = TRUE) %>%
+      visEdges(smooth = FALSE) %>%
+      visLayout(randomSeed = 42)
+  })
+}
+
+shinyApp(ui, server)
+
+```
