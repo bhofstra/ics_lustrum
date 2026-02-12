@@ -1,0 +1,181 @@
+---
+title: "Collabs Viz"
+#bibliography: references.bib
+author: "Bas Hofstra"
+---
+
+
+
+```{r, globalsettings, echo=FALSE, warning=FALSE, results='hide'}
+library(knitr)
+
+knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE, warning = FALSE, message = FALSE,comment = "#>", cache=TRUE, class.source=c("test"), class.output=c("test2"))
+options(width = 100)
+rgl::setupKnitr()
+
+
+
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+#klippy::klippy(color = 'darkred')
+#klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+Last compiled on `r format(Sys.time(), '%B, %Y')`
+
+<br>
+
+
+
+
+Some packages necessary to run the analyses.
+
+```{r packages}
+rm(list = ls())
+library("groundhog")
+groundhog.library("
+                  library('openxlsx')
+                  library('flextable')
+                  library('dplyr')
+                  library('stringdist')
+                  library('stringi')
+                  library('stringr')
+                  library('ggraph')
+                  library('tidygraph')
+                  library('igraph')
+                  library('visNetwork')
+                  library('gganimate')
+                  ", 
+                  "2025-04-10")
+
+```
+
+# Data
+
+Load the output data we generated before
+
+```{r dataloading}
+load("data/output_data/el_static.rda")
+load("data/output_data/nodes_static.rda")
+load("data/output_data/el_dyn1.rda")
+load("data/output_data/el_dyn2.rda")
+load("data/output_data/el_dyn3.rda")
+load("data/output_data/el_dyn4.rda")
+load("data/output_data/el_dyn5.rda")
+load("data/output_data/el_dyn6.rda")
+load("data/output_data/el_dyn7.rda")
+
+```
+
+# Standard Viz
+
+Some starting viz.
+
+```{r viz_static}
+
+# gen graph
+g <- graph_from_data_frame(edgelist1, directed = FALSE)
+
+# add node characteristics fecundity (how many phds)
+head(V(g)$name)
+colnames(nodes)[1] <- "name"
+V(g)$fec <- nodes$Freq[match(V(g)$name, nodes$name)]
+head(V(g)$fec)
+
+# generate the graph
+ggraph(g, layout = "fr") +
+  geom_edge_link(aes(width = n),
+                 color = "grey50",
+                 alpha = .5) +
+  scale_edge_width(range = c(0.2, 3)) +
+  geom_node_point(aes(size = fec),
+                  color = "black",
+                  fill = "steelblue",
+                  shape = 21,
+                  alpha = .9) +
+  scale_size(range = c(3, 14)) +
+  geom_node_text(aes(label = name),
+                 repel = TRUE,
+                 size = 3) +
+  theme_void() +
+  ggtitle("Supervisor collaborations: 1990-2025") +
+      theme(
+        plot.margin = margin(10, 10, 10, 10)
+      )
+
+```
+
+
+
+# Nicer Viz
+
+```{r viz_shiny}
+
+# number of ties for info on hover
+node_count <- degree(g)
+
+# --- Nodes ---
+nodes <- data.frame(
+  id    = V(g)$name,
+  label = "",
+  value = V(g)$fec,
+  title = sprintf(
+    "<b>%s</b><br>PhDs: %s<br>Collabs: %s",
+    V(g)$name,
+    V(g)$fec,
+    node_count
+  ),
+  stringsAsFactors = FALSE
+)
+
+# --- Edges ---
+ed <- as_data_frame(g, what = "edges")
+edges <- data.frame(
+  from  = ed$from,
+  to    = ed$to,
+  value = ed$n,
+  title = paste0("n: ", ed$n),
+  stringsAsFactors = FALSE
+)
+library(htmltools)
+# --- Plot ---
+tagList(
+  tags$h3(
+    "Supervisor collaborations: 1990-2025",
+    style = "
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: 600;
+      margin-bottom: 10px;
+    "
+  ),
+visNetwork(nodes, edges, height = "1000px", width = "100%") %>%
+  visInteraction(hover = TRUE) %>%
+  visOptions(highlightNearest = TRUE) %>%
+  visEdges(smooth = FALSE) %>%
+  visLayout(randomSeed = 42) %>%
+  visPhysics(stabilization = TRUE) %>%
+  visGroups(groupname = "default") %>%
+  htmlwidgets::onRender("
+    function(el) {
+      el.style.background = '#ffffff';
+      el.style.borderRadius = '14px';
+      el.style.boxShadow = '0 12px 35px rgba(0,0,0,0.18)';
+      el.style.padding = '10px';
+      el.style.border = '1px solid #e6e6e6';
+    }
+  ")
+)
+```
+
+
+
+
+
+
+
+

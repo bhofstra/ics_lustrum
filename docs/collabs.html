@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Bas Hofstra" />
+
+
+<title>Collabs Viz</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/clipboard-1.7.1/clipboard.min.js"></script>
+<link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
+<link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
+<script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="site_libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="site_libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="site_libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="tweaks.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Data
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="data_cleaning.html">Data cleaning</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="collabs.html">Collabs Viz</a>
+    </li>
+    <li>
+      <a href="genea.html">Genealogy Viz</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/bhofstra/ics_lustrum">
+    <span class="fab fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+<li role="separator" class="divider"></li>
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Collabs Viz</h1>
+<h4 class="author">Bas Hofstra</h4>
+
+</div>
+
+
+<script>
+  addClassKlippyTo("pre.r, pre.markdown");
+  addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
+</script>
+<p>Last compiled on February, 2026</p>
+<p><br></p>
+<p>Some packages necessary to run the analyses.</p>
+<pre class="r test"><code>rm(list = ls())
+library(&quot;groundhog&quot;)
+groundhog.library(&quot;
+                  library(&#39;openxlsx&#39;)
+                  library(&#39;flextable&#39;)
+                  library(&#39;dplyr&#39;)
+                  library(&#39;stringdist&#39;)
+                  library(&#39;stringi&#39;)
+                  library(&#39;stringr&#39;)
+                  library(&#39;ggraph&#39;)
+                  library(&#39;tidygraph&#39;)
+                  library(&#39;igraph&#39;)
+                  library(&#39;visNetwork&#39;)
+                  &quot;,
+    &quot;2025-04-10&quot;)</code></pre>
+<div id="data" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Data</h1>
+<p>Load the output data we generated before</p>
+<pre class="r test"><code>load(&quot;data/output_data/el_static.rda&quot;)
+load(&quot;data/output_data/nodes_static.rda&quot;)
+load(&quot;data/output_data/el_dyn1.rda&quot;)
+load(&quot;data/output_data/el_dyn2.rda&quot;)
+load(&quot;data/output_data/el_dyn3.rda&quot;)
+load(&quot;data/output_data/el_dyn4.rda&quot;)
+load(&quot;data/output_data/el_dyn5.rda&quot;)
+load(&quot;data/output_data/el_dyn6.rda&quot;)
+load(&quot;data/output_data/el_dyn7.rda&quot;)</code></pre>
+</div>
+<div id="standard-viz" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Standard Viz</h1>
+<p>Some starting viz.</p>
+<pre class="r test"><code># gen graph
+g &lt;- graph_from_data_frame(edgelist1, directed = FALSE)
+
+# add node characteristics fecundity (how many phds)
+head(V(g)$name)</code></pre>
+<pre class="test2"><code>#&gt; [1] &quot;a_bakker&quot;         &quot;a_borsboom&quot;       &quot;a_doorne-huiseks&quot; &quot;a_doorne-huiskes&quot; &quot;a_flache&quot;        
+#&gt; [6] &quot;a_knigge&quot;</code></pre>
+<pre class="r test"><code>colnames(nodes)[1] &lt;- &quot;name&quot;
+V(g)$fec &lt;- nodes$Freq[match(V(g)$name, nodes$name)]
+head(V(g)$fec)</code></pre>
+<pre class="test2"><code>#&gt; [1]  1  1  1  3 17  1</code></pre>
+<pre class="r test"><code># generate the graph
+ggraph(g, layout = &quot;fr&quot;) + geom_edge_link(aes(width = n), color = &quot;grey50&quot;, alpha = 0.5) + scale_edge_width(range = c(0.2,
+    3)) + geom_node_point(aes(size = fec), color = &quot;black&quot;, fill = &quot;steelblue&quot;, shape = 21, alpha = 0.9) +
+    scale_size(range = c(3, 14)) + geom_node_text(aes(label = name), repel = TRUE, size = 3) + theme_void() +
+    ggtitle(&quot;Supervisor collaborations: 1990-2025&quot;) + theme(plot.margin = margin(10, 10, 10, 10))</code></pre>
+<p><img src="collabs_files/figure-html/viz_static-1.png" width="672" /></p>
+</div>
+<div id="nicer-viz" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Nicer Viz</h1>
+<pre class="r test"><code># number of ties for info on hover
+node_count &lt;- degree(g)
+
+# --- Nodes ---
+nodes &lt;- data.frame(id = V(g)$name, label = &quot;&quot;, value = V(g)$fec, title = sprintf(&quot;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;PhDs: %s&lt;br&gt;Collabs: %s&quot;,
+    V(g)$name, V(g)$fec, node_count), stringsAsFactors = FALSE)
+
+# --- Edges ---
+ed &lt;- as_data_frame(g, what = &quot;edges&quot;)
+edges &lt;- data.frame(from = ed$from, to = ed$to, value = ed$n, title = paste0(&quot;n: &quot;, ed$n), stringsAsFactors = FALSE)
+library(htmltools)
+# --- Plot ---
+tagList(tags$h3(&quot;Supervisor collaborations: 1990-2025&quot;, style = &quot;
+      font-family: Helvetica, Arial, sans-serif;
+      font-weight: 600;
+      margin-bottom: 10px;
+    &quot;),
+    visNetwork(nodes, edges, height = &quot;1000px&quot;, width = &quot;100%&quot;) %&gt;%
+        visInteraction(hover = TRUE) %&gt;%
+        visOptions(highlightNearest = TRUE) %&gt;%
+        visEdges(smooth = FALSE) %&gt;%
+        visLayout(randomSeed = 42) %&gt;%
+        visPhysics(stabilization = TRUE) %&gt;%
+        visGroups(groupname = &quot;default&quot;) %&gt;%
+        htmlwidgets::onRender(&quot;
+    function(el) {
+      el.style.background = &#39;#ffffff&#39;;
+      el.style.borderRadius = &#39;14px&#39;;
+      el.style.boxShadow = &#39;0 12px 35px rgba(0,0,0,0.18)&#39;;
+      el.style.padding = &#39;10px&#39;;
+      el.style.border = &#39;1px solid #e6e6e6&#39;;
+    }
+  &quot;))</code></pre>
+<h3 style="&#10;      font-family: Helvetica, Arial, sans-serif;&#10;      font-weight: 600;&#10;      margin-bottom: 10px;&#10;    ">Supervisor collaborations: 1990-2025</h3>
+<div id="htmlwidget-c2d536eb1d9c084e12d3" style="width:100%;height:1000px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c2d536eb1d9c084e12d3">{"x":{"nodes":{"id":["a_bakker","a_borsboom","a_doorne-huiseks","a_doorne-huiskes","a_flache","a_knigge","a_komter","a_liefbroer","a_nederhof","a_need","a_poortman","a_rijt","a_roeters","a_smeekes","a_swaan","b_becker","b_bilecen","b_buunk","b_derks","b_guroglu","b_jeronimus","b_laffan","b_lancee","b_martinovic","b_oldenburg","b_steenbergen","b_tax","b_volker","c_baerveld","c_baerveldt","c_berger","c_eijk","c_hoede","c_lammers","c_rees","c_salmivalli","c_snijders","c_stechlich","c_steglich","c_sterkens","c_tseung-wong","c_vlek","c_vrooman","d_bakker","d_barrera","d_beckers","d_dessens","d_dijkstra","d_graaf","d_koch","d_nieboer","d_stapel","d_vos","d_zhou","e_demerouti","e_eisinga","e_gordijn","e_harteveld","e_jaspers","e_jonge","e_kluwer","e_poppe","e_verbakel","f_fleischmann","f_giardini","f_haanstra","f_leeuw","f_stokman","f_tazelaar","f_tubergen","f_wel","f_wester","g_anthonio","g_bruinsma","g_glebbeek","g_huitsing","g_kraaykamp","g_lodder","g_meijen","g_stulp","h_bekhuis","h_boeije","h_dekkers","h_emmerik","h_flap","h_folmer","h_ganzeboom","h_hermkens","h_hornstra","h_kruse","h_lodewijkz","h_snieder","h_stoof","h_vos","h_werfhorst","h_wilke","i_gaalen","i_maas","j_blom","j_dessens","j_dijkstra","j_faber","j_gerris","j_huisman","j_jansen","j_janssen","j_ormel","j_park","j_peschar","j_plantenga","j_schippers","j_siegers","j_slaets","j_thijs","j_tolsma","j_weesie","j_wit","j_zee","j_zuidersma","k_begall","k_institute","k_ivanova","k_muhler","k_phalet","k_sanders","k_wittebrood","l_adelman","l_baams","l_blommaert","l_dulk","l_hagendoorn","l_heyse","l_jans","l_lammers","l_laninga-wijnen","l_leeuw","l_liebrand","l_steg","m_assen","m_brink","m_coenders","m_duijn","m_gesthuizen","m_gijsberts","m_goos","m_grotenhuis","m_herweijer","m_huisman","m_kalmijn","m_kretzschmar","m_labussere","m_leeuwen","m_lubbers","m_mills","m_savelkoul","m_spreen","m_verkuyten","m_visser","m_wolbers","n_ellemers","n_graaf","n_spierings","n_steverink","p_dykstra","p_graaf","p_groenewegen","p_groenwegen","p_hodiamont","p_kleingeld","p_nieuwbeerta","p_popping","p_scheepers","p_sleegers","r_bosker","r_corten","r_holzhacker","r_mokken","r_stolk","r_torenvlied","r_usa)","r_veenstra","r_velden","r_wielers","r_wippler","r_wittek","s_denters","s_geven","s_klosse","s_lange","s_lindenberg","s_rosenkranz","s_sanders","s_slaets","s_stokman","s_suurmeijer","s_waslander","t_bol","t_lippe","t_moor","t_snijders","t_takacs","t_thomson","v_buskens","w_raub","w_ultee","m_mas","r_leenders","s_siegers","w_jager","w_vollebergh","t_knijn","g_mollenhorst","z_zeggelink","p_jonge","w_brug","s_steinmetz","t_kuhn","v_schutjens","t_kretschmer","s_kinsbergen","i_nagel","w_hennen","w_schuur","y_kops","t_stark","m_hek","r_koning","r_meuleman","j_dagevos","j_lucassen","w_arts","w_stroebe","t_leopold","w_heuvel","s_schippers","p_scheppers","s_otten","z_lippenyi","r_eisenga","w_przepiorka","s_ruiter","v_schuur","w_molenaar","w_sodeur"],"label":["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],"value":[1,1,1,3,17,1,3,3,1,6,9,2,1,1,1,1,1,1,1,1,1,1,5,4,1,1,1,9,1,1,1,2,1,2,1,2,1,1,8,1,1,2,1,1,2,1,2,2,1,1,1,1,4,1,1,2,1,1,3,1,3,2,3,2,1,1,1,32,5,13,1,2,1,2,3,3,22,2,1,1,1,1,1,2,23,1,21,2,1,1,1,2,1,1,4,2,1,13,2,1,11,1,2,1,2,1,3,1,8,1,1,11,1,4,7,10,1,1,1,1,1,2,2,1,1,1,1,1,1,2,7,8,1,1,2,2,2,2,1,1,7,5,4,1,1,3,1,1,9,1,1,6,15,11,1,1,19,1,5,2,17,4,5,5,11,4,1,1,1,3,2,17,1,1,3,1,4,1,6,1,26,1,5,16,25,1,1,1,1,42,3,2,1,1,1,1,5,31,1,42,1,2,17,31,30,2,1,3,1,2,3,1,2,1,1,1,1,1,2,1,1,1,2,1,2,1,1,1,1,1,1,1,3,2,1,1,1,1,1,3,1,1,1,1],"title":["<b>a_bakker<\/b><br>PhDs: 1<br>Collabs: 2","<b>a_borsboom<\/b><br>PhDs: 1<br>Collabs: 2","<b>a_doorne-huiseks<\/b><br>PhDs: 1<br>Collabs: 1","<b>a_doorne-huiskes<\/b><br>PhDs: 3<br>Collabs: 6","<b>a_flache<\/b><br>PhDs: 17<br>Collabs: 24","<b>a_knigge<\/b><br>PhDs: 1<br>Collabs: 1","<b>a_komter<\/b><br>PhDs: 3<br>Collabs: 5","<b>a_liefbroer<\/b><br>PhDs: 3<br>Collabs: 5","<b>a_nederhof<\/b><br>PhDs: 1<br>Collabs: 2","<b>a_need<\/b><br>PhDs: 6<br>Collabs: 5","<b>a_poortman<\/b><br>PhDs: 9<br>Collabs: 10","<b>a_rijt<\/b><br>PhDs: 2<br>Collabs: 4","<b>a_roeters<\/b><br>PhDs: 1<br>Collabs: 1","<b>a_smeekes<\/b><br>PhDs: 1<br>Collabs: 1","<b>a_swaan<\/b><br>PhDs: 1<br>Collabs: 3","<b>b_becker<\/b><br>PhDs: 1<br>Collabs: 2","<b>b_bilecen<\/b><br>PhDs: 1<br>Collabs: 1","<b>b_buunk<\/b><br>PhDs: 1<br>Collabs: 3","<b>b_derks<\/b><br>PhDs: 1<br>Collabs: 3","<b>b_guroglu<\/b><br>PhDs: 1<br>Collabs: 2","<b>b_jeronimus<\/b><br>PhDs: 1<br>Collabs: 3","<b>b_laffan<\/b><br>PhDs: 1<br>Collabs: 2","<b>b_lancee<\/b><br>PhDs: 5<br>Collabs: 9","<b>b_martinovic<\/b><br>PhDs: 4<br>Collabs: 2","<b>b_oldenburg<\/b><br>PhDs: 1<br>Collabs: 2","<b>b_steenbergen<\/b><br>PhDs: 1<br>Collabs: 3","<b>b_tax<\/b><br>PhDs: 1<br>Collabs: 3","<b>b_volker<\/b><br>PhDs: 9<br>Collabs: 12","<b>c_baerveld<\/b><br>PhDs: 1<br>Collabs: 3","<b>c_baerveldt<\/b><br>PhDs: 1<br>Collabs: 2","<b>c_berger<\/b><br>PhDs: 1<br>Collabs: 3","<b>c_eijk<\/b><br>PhDs: 2<br>Collabs: 3","<b>c_hoede<\/b><br>PhDs: 1<br>Collabs: 2","<b>c_lammers<\/b><br>PhDs: 2<br>Collabs: 3","<b>c_rees<\/b><br>PhDs: 1<br>Collabs: 1","<b>c_salmivalli<\/b><br>PhDs: 2<br>Collabs: 4","<b>c_snijders<\/b><br>PhDs: 1<br>Collabs: 2","<b>c_stechlich<\/b><br>PhDs: 1<br>Collabs: 3","<b>c_steglich<\/b><br>PhDs: 8<br>Collabs: 8","<b>c_sterkens<\/b><br>PhDs: 1<br>Collabs: 2","<b>c_tseung-wong<\/b><br>PhDs: 1<br>Collabs: 2","<b>c_vlek<\/b><br>PhDs: 2<br>Collabs: 3","<b>c_vrooman<\/b><br>PhDs: 1<br>Collabs: 1","<b>d_bakker<\/b><br>PhDs: 1<br>Collabs: 2","<b>d_barrera<\/b><br>PhDs: 2<br>Collabs: 4","<b>d_beckers<\/b><br>PhDs: 1<br>Collabs: 1","<b>d_dessens<\/b><br>PhDs: 2<br>Collabs: 3","<b>d_dijkstra<\/b><br>PhDs: 2<br>Collabs: 4","<b>d_graaf<\/b><br>PhDs: 1<br>Collabs: 2","<b>d_koch<\/b><br>PhDs: 1<br>Collabs: 2","<b>d_nieboer<\/b><br>PhDs: 1<br>Collabs: 3","<b>d_stapel<\/b><br>PhDs: 1<br>Collabs: 1","<b>d_vos<\/b><br>PhDs: 4<br>Collabs: 8","<b>d_zhou<\/b><br>PhDs: 1<br>Collabs: 2","<b>e_demerouti<\/b><br>PhDs: 1<br>Collabs: 2","<b>e_eisinga<\/b><br>PhDs: 2<br>Collabs: 4","<b>e_gordijn<\/b><br>PhDs: 1<br>Collabs: 2","<b>e_harteveld<\/b><br>PhDs: 1<br>Collabs: 3","<b>e_jaspers<\/b><br>PhDs: 3<br>Collabs: 4","<b>e_jonge<\/b><br>PhDs: 1<br>Collabs: 2","<b>e_kluwer<\/b><br>PhDs: 3<br>Collabs: 3","<b>e_poppe<\/b><br>PhDs: 2<br>Collabs: 3","<b>e_verbakel<\/b><br>PhDs: 3<br>Collabs: 4","<b>f_fleischmann<\/b><br>PhDs: 2<br>Collabs: 2","<b>f_giardini<\/b><br>PhDs: 1<br>Collabs: 3","<b>f_haanstra<\/b><br>PhDs: 1<br>Collabs: 2","<b>f_leeuw<\/b><br>PhDs: 1<br>Collabs: 2","<b>f_stokman<\/b><br>PhDs: 32<br>Collabs: 29","<b>f_tazelaar<\/b><br>PhDs: 5<br>Collabs: 8","<b>f_tubergen<\/b><br>PhDs: 13<br>Collabs: 15","<b>f_wel<\/b><br>PhDs: 1<br>Collabs: 2","<b>f_wester<\/b><br>PhDs: 2<br>Collabs: 4","<b>g_anthonio<\/b><br>PhDs: 1<br>Collabs: 2","<b>g_bruinsma<\/b><br>PhDs: 2<br>Collabs: 3","<b>g_glebbeek<\/b><br>PhDs: 3<br>Collabs: 4","<b>g_huitsing<\/b><br>PhDs: 3<br>Collabs: 5","<b>g_kraaykamp<\/b><br>PhDs: 22<br>Collabs: 22","<b>g_lodder<\/b><br>PhDs: 2<br>Collabs: 5","<b>g_meijen<\/b><br>PhDs: 1<br>Collabs: 1","<b>g_stulp<\/b><br>PhDs: 1<br>Collabs: 2","<b>h_bekhuis<\/b><br>PhDs: 1<br>Collabs: 3","<b>h_boeije<\/b><br>PhDs: 1<br>Collabs: 3","<b>h_dekkers<\/b><br>PhDs: 1<br>Collabs: 2","<b>h_emmerik<\/b><br>PhDs: 2<br>Collabs: 5","<b>h_flap<\/b><br>PhDs: 23<br>Collabs: 28","<b>h_folmer<\/b><br>PhDs: 1<br>Collabs: 1","<b>h_ganzeboom<\/b><br>PhDs: 21<br>Collabs: 27","<b>h_hermkens<\/b><br>PhDs: 2<br>Collabs: 4","<b>h_hornstra<\/b><br>PhDs: 1<br>Collabs: 1","<b>h_kruse<\/b><br>PhDs: 1<br>Collabs: 2","<b>h_lodewijkz<\/b><br>PhDs: 1<br>Collabs: 2","<b>h_snieder<\/b><br>PhDs: 2<br>Collabs: 2","<b>h_stoof<\/b><br>PhDs: 1<br>Collabs: 1","<b>h_vos<\/b><br>PhDs: 1<br>Collabs: 2","<b>h_werfhorst<\/b><br>PhDs: 4<br>Collabs: 5","<b>h_wilke<\/b><br>PhDs: 2<br>Collabs: 1","<b>i_gaalen<\/b><br>PhDs: 1<br>Collabs: 1","<b>i_maas<\/b><br>PhDs: 13<br>Collabs: 10","<b>j_blom<\/b><br>PhDs: 2<br>Collabs: 3","<b>j_dessens<\/b><br>PhDs: 1<br>Collabs: 2","<b>j_dijkstra<\/b><br>PhDs: 11<br>Collabs: 12","<b>j_faber<\/b><br>PhDs: 1<br>Collabs: 1","<b>j_gerris<\/b><br>PhDs: 2<br>Collabs: 3","<b>j_huisman<\/b><br>PhDs: 1<br>Collabs: 2","<b>j_jansen<\/b><br>PhDs: 2<br>Collabs: 5","<b>j_janssen<\/b><br>PhDs: 1<br>Collabs: 1","<b>j_ormel<\/b><br>PhDs: 3<br>Collabs: 4","<b>j_park<\/b><br>PhDs: 1<br>Collabs: 1","<b>j_peschar<\/b><br>PhDs: 8<br>Collabs: 9","<b>j_plantenga<\/b><br>PhDs: 1<br>Collabs: 1","<b>j_schippers<\/b><br>PhDs: 1<br>Collabs: 2","<b>j_siegers<\/b><br>PhDs: 11<br>Collabs: 15","<b>j_slaets<\/b><br>PhDs: 1<br>Collabs: 2","<b>j_thijs<\/b><br>PhDs: 4<br>Collabs: 3","<b>j_tolsma<\/b><br>PhDs: 7<br>Collabs: 11","<b>j_weesie<\/b><br>PhDs: 10<br>Collabs: 9","<b>j_wit<\/b><br>PhDs: 1<br>Collabs: 1","<b>j_zee<\/b><br>PhDs: 1<br>Collabs: 2","<b>j_zuidersma<\/b><br>PhDs: 1<br>Collabs: 3","<b>k_begall<\/b><br>PhDs: 1<br>Collabs: 2","<b>k_institute<\/b><br>PhDs: 1<br>Collabs: 2","<b>k_ivanova<\/b><br>PhDs: 2<br>Collabs: 1","<b>k_muhler<\/b><br>PhDs: 2<br>Collabs: 4","<b>k_phalet<\/b><br>PhDs: 1<br>Collabs: 3","<b>k_sanders<\/b><br>PhDs: 1<br>Collabs: 2","<b>k_wittebrood<\/b><br>PhDs: 1<br>Collabs: 2","<b>l_adelman<\/b><br>PhDs: 1<br>Collabs: 1","<b>l_baams<\/b><br>PhDs: 1<br>Collabs: 1","<b>l_blommaert<\/b><br>PhDs: 1<br>Collabs: 3","<b>l_dulk<\/b><br>PhDs: 2<br>Collabs: 3","<b>l_hagendoorn<\/b><br>PhDs: 7<br>Collabs: 11","<b>l_heyse<\/b><br>PhDs: 8<br>Collabs: 6","<b>l_jans<\/b><br>PhDs: 1<br>Collabs: 3","<b>l_lammers<\/b><br>PhDs: 1<br>Collabs: 2","<b>l_laninga-wijnen<\/b><br>PhDs: 2<br>Collabs: 1","<b>l_leeuw<\/b><br>PhDs: 2<br>Collabs: 4","<b>l_liebrand<\/b><br>PhDs: 2<br>Collabs: 4","<b>l_steg<\/b><br>PhDs: 2<br>Collabs: 4","<b>m_assen<\/b><br>PhDs: 1<br>Collabs: 2","<b>m_brink<\/b><br>PhDs: 1<br>Collabs: 2","<b>m_coenders<\/b><br>PhDs: 7<br>Collabs: 9","<b>m_duijn<\/b><br>PhDs: 5<br>Collabs: 4","<b>m_gesthuizen<\/b><br>PhDs: 4<br>Collabs: 5","<b>m_gijsberts<\/b><br>PhDs: 1<br>Collabs: 3","<b>m_goos<\/b><br>PhDs: 1<br>Collabs: 1","<b>m_grotenhuis<\/b><br>PhDs: 3<br>Collabs: 4","<b>m_herweijer<\/b><br>PhDs: 1<br>Collabs: 2","<b>m_huisman<\/b><br>PhDs: 1<br>Collabs: 3","<b>m_kalmijn<\/b><br>PhDs: 9<br>Collabs: 10","<b>m_kretzschmar<\/b><br>PhDs: 1<br>Collabs: 1","<b>m_labussere<\/b><br>PhDs: 1<br>Collabs: 2","<b>m_leeuwen<\/b><br>PhDs: 6<br>Collabs: 4","<b>m_lubbers<\/b><br>PhDs: 15<br>Collabs: 19","<b>m_mills<\/b><br>PhDs: 11<br>Collabs: 10","<b>m_savelkoul<\/b><br>PhDs: 1<br>Collabs: 3","<b>m_spreen<\/b><br>PhDs: 1<br>Collabs: 2","<b>m_verkuyten<\/b><br>PhDs: 19<br>Collabs: 16","<b>m_visser<\/b><br>PhDs: 1<br>Collabs: 2","<b>m_wolbers<\/b><br>PhDs: 5<br>Collabs: 5","<b>n_ellemers<\/b><br>PhDs: 2<br>Collabs: 4","<b>n_graaf<\/b><br>PhDs: 17<br>Collabs: 14","<b>n_spierings<\/b><br>PhDs: 4<br>Collabs: 5","<b>n_steverink<\/b><br>PhDs: 5<br>Collabs: 9","<b>p_dykstra<\/b><br>PhDs: 5<br>Collabs: 9","<b>p_graaf<\/b><br>PhDs: 11<br>Collabs: 10","<b>p_groenewegen<\/b><br>PhDs: 4<br>Collabs: 6","<b>p_groenwegen<\/b><br>PhDs: 1<br>Collabs: 2","<b>p_hodiamont<\/b><br>PhDs: 1<br>Collabs: 3","<b>p_kleingeld<\/b><br>PhDs: 1<br>Collabs: 2","<b>p_nieuwbeerta<\/b><br>PhDs: 3<br>Collabs: 4","<b>p_popping<\/b><br>PhDs: 2<br>Collabs: 4","<b>p_scheepers<\/b><br>PhDs: 17<br>Collabs: 23","<b>p_sleegers<\/b><br>PhDs: 1<br>Collabs: 3","<b>r_bosker<\/b><br>PhDs: 1<br>Collabs: 2","<b>r_corten<\/b><br>PhDs: 3<br>Collabs: 3","<b>r_holzhacker<\/b><br>PhDs: 1<br>Collabs: 2","<b>r_mokken<\/b><br>PhDs: 4<br>Collabs: 5","<b>r_stolk<\/b><br>PhDs: 1<br>Collabs: 2","<b>r_torenvlied<\/b><br>PhDs: 6<br>Collabs: 9","<b>r_usa)<\/b><br>PhDs: 1<br>Collabs: 2","<b>r_veenstra<\/b><br>PhDs: 26<br>Collabs: 26","<b>r_velden<\/b><br>PhDs: 1<br>Collabs: 3","<b>r_wielers<\/b><br>PhDs: 5<br>Collabs: 5","<b>r_wippler<\/b><br>PhDs: 16<br>Collabs: 23","<b>r_wittek<\/b><br>PhDs: 25<br>Collabs: 26","<b>s_denters<\/b><br>PhDs: 1<br>Collabs: 2","<b>s_geven<\/b><br>PhDs: 1<br>Collabs: 2","<b>s_klosse<\/b><br>PhDs: 1<br>Collabs: 2","<b>s_lange<\/b><br>PhDs: 1<br>Collabs: 3","<b>s_lindenberg<\/b><br>PhDs: 42<br>Collabs: 39","<b>s_rosenkranz<\/b><br>PhDs: 3<br>Collabs: 2","<b>s_sanders<\/b><br>PhDs: 2<br>Collabs: 5","<b>s_slaets<\/b><br>PhDs: 1<br>Collabs: 2","<b>s_stokman<\/b><br>PhDs: 1<br>Collabs: 1","<b>s_suurmeijer<\/b><br>PhDs: 1<br>Collabs: 2","<b>s_waslander<\/b><br>PhDs: 1<br>Collabs: 2","<b>t_bol<\/b><br>PhDs: 5<br>Collabs: 6","<b>t_lippe<\/b><br>PhDs: 31<br>Collabs: 32","<b>t_moor<\/b><br>PhDs: 1<br>Collabs: 1","<b>t_snijders<\/b><br>PhDs: 42<br>Collabs: 39","<b>t_takacs<\/b><br>PhDs: 1<br>Collabs: 3","<b>t_thomson<\/b><br>PhDs: 2<br>Collabs: 3","<b>v_buskens<\/b><br>PhDs: 17<br>Collabs: 14","<b>w_raub<\/b><br>PhDs: 31<br>Collabs: 34","<b>w_ultee<\/b><br>PhDs: 30<br>Collabs: 28","<b>m_mas<\/b><br>PhDs: 2<br>Collabs: 2","<b>r_leenders<\/b><br>PhDs: 1<br>Collabs: 3","<b>s_siegers<\/b><br>PhDs: 3<br>Collabs: 7","<b>w_jager<\/b><br>PhDs: 1<br>Collabs: 2","<b>w_vollebergh<\/b><br>PhDs: 2<br>Collabs: 3","<b>t_knijn<\/b><br>PhDs: 3<br>Collabs: 5","<b>g_mollenhorst<\/b><br>PhDs: 1<br>Collabs: 2","<b>z_zeggelink<\/b><br>PhDs: 2<br>Collabs: 5","<b>p_jonge<\/b><br>PhDs: 1<br>Collabs: 3","<b>w_brug<\/b><br>PhDs: 1<br>Collabs: 3","<b>s_steinmetz<\/b><br>PhDs: 1<br>Collabs: 1","<b>t_kuhn<\/b><br>PhDs: 1<br>Collabs: 2","<b>v_schutjens<\/b><br>PhDs: 1<br>Collabs: 3","<b>t_kretschmer<\/b><br>PhDs: 2<br>Collabs: 4","<b>s_kinsbergen<\/b><br>PhDs: 1<br>Collabs: 2","<b>i_nagel<\/b><br>PhDs: 1<br>Collabs: 2","<b>w_hennen<\/b><br>PhDs: 1<br>Collabs: 1","<b>w_schuur<\/b><br>PhDs: 2<br>Collabs: 4","<b>y_kops<\/b><br>PhDs: 1<br>Collabs: 3","<b>t_stark<\/b><br>PhDs: 2<br>Collabs: 3","<b>m_hek<\/b><br>PhDs: 1<br>Collabs: 1","<b>r_koning<\/b><br>PhDs: 1<br>Collabs: 1","<b>r_meuleman<\/b><br>PhDs: 1<br>Collabs: 2","<b>j_dagevos<\/b><br>PhDs: 1<br>Collabs: 1","<b>j_lucassen<\/b><br>PhDs: 1<br>Collabs: 1","<b>w_arts<\/b><br>PhDs: 1<br>Collabs: 2","<b>w_stroebe<\/b><br>PhDs: 1<br>Collabs: 2","<b>t_leopold<\/b><br>PhDs: 3<br>Collabs: 3","<b>w_heuvel<\/b><br>PhDs: 2<br>Collabs: 3","<b>s_schippers<\/b><br>PhDs: 1<br>Collabs: 2","<b>p_scheppers<\/b><br>PhDs: 1<br>Collabs: 3","<b>s_otten<\/b><br>PhDs: 1<br>Collabs: 2","<b>z_lippenyi<\/b><br>PhDs: 1<br>Collabs: 2","<b>r_eisenga<\/b><br>PhDs: 1<br>Collabs: 1","<b>w_przepiorka<\/b><br>PhDs: 3<br>Collabs: 2","<b>s_ruiter<\/b><br>PhDs: 1<br>Collabs: 1","<b>v_schuur<\/b><br>PhDs: 1<br>Collabs: 2","<b>w_molenaar<\/b><br>PhDs: 1<br>Collabs: 1","<b>w_sodeur<\/b><br>PhDs: 1<br>Collabs: 1"]},"edges":{"from":["a_bakker","a_bakker","a_borsboom","a_borsboom","a_doorne-huiseks","a_doorne-huiskes","a_doorne-huiskes","a_doorne-huiskes","a_doorne-huiskes","a_doorne-huiskes","a_doorne-huiskes","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_flache","a_knigge","a_komter","a_komter","a_komter","a_komter","a_komter","a_liefbroer","a_liefbroer","a_liefbroer","a_liefbroer","a_liefbroer","a_nederhof","a_nederhof","a_need","a_need","a_need","a_need","a_poortman","a_poortman","a_poortman","a_poortman","a_poortman","a_poortman","a_poortman","a_poortman","a_poortman","a_poortman","a_rijt","a_rijt","a_rijt","a_rijt","a_roeters","a_smeekes","a_swaan","a_swaan","a_swaan","b_becker","b_becker","b_bilecen","b_buunk","b_buunk","b_derks","b_derks","b_derks","b_guroglu","b_guroglu","b_jeronimus","b_jeronimus","b_jeronimus","b_laffan","b_laffan","b_lancee","b_lancee","b_lancee","b_lancee","b_lancee","b_lancee","b_lancee","b_lancee","b_lancee","b_martinovic","b_martinovic","b_oldenburg","b_oldenburg","b_steenbergen","b_steenbergen","b_steenbergen","b_tax","b_tax","b_tax","b_volker","b_volker","b_volker","b_volker","b_volker","b_volker","b_volker","b_volker","b_volker","b_volker","c_baerveld","c_baerveld","c_baerveld","c_baerveldt","c_baerveldt","c_berger","c_berger","c_berger","c_eijk","c_eijk","c_eijk","c_hoede","c_hoede","c_lammers","c_lammers","c_lammers","c_rees","c_salmivalli","c_salmivalli","c_salmivalli","c_salmivalli","c_snijders","c_snijders","c_stechlich","c_stechlich","c_steglich","c_steglich","c_steglich","c_steglich","c_steglich","c_steglich","c_steglich","c_sterkens","c_sterkens","c_tseung-wong","c_vlek","c_vlek","c_vlek","c_vrooman","d_bakker","d_barrera","d_barrera","d_barrera","d_beckers","d_dessens","d_dessens","d_dessens","d_dijkstra","d_dijkstra","d_dijkstra","d_dijkstra","d_graaf","d_koch","d_koch","d_nieboer","d_nieboer","d_stapel","d_vos","d_vos","d_vos","d_vos","d_vos","d_zhou","e_demerouti","e_demerouti","e_eisinga","e_eisinga","e_eisinga","e_eisinga","e_gordijn","e_gordijn","e_harteveld","e_harteveld","e_jaspers","e_jaspers","e_jaspers","e_jaspers","e_jonge","e_kluwer","e_kluwer","e_kluwer","e_poppe","e_poppe","e_poppe","e_verbakel","e_verbakel","e_verbakel","f_fleischmann","f_fleischmann","f_giardini","f_giardini","f_giardini","f_haanstra","f_haanstra","f_leeuw","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_stokman","f_tazelaar","f_tazelaar","f_tazelaar","f_tazelaar","f_tazelaar","f_tazelaar","f_tazelaar","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_tubergen","f_wel","f_wel","f_wester","f_wester","f_wester","f_wester","g_anthonio","g_anthonio","g_bruinsma","g_bruinsma","g_bruinsma","g_glebbeek","g_glebbeek","g_glebbeek","g_glebbeek","g_huitsing","g_huitsing","g_huitsing","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_kraaykamp","g_lodder","g_lodder","g_lodder","g_meijen","g_stulp","g_stulp","h_bekhuis","h_boeije","h_boeije","h_dekkers","h_dekkers","h_emmerik","h_emmerik","h_emmerik","h_emmerik","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_flap","h_folmer","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_ganzeboom","h_hermkens","h_hermkens","h_hornstra","h_kruse","h_kruse","h_lodewijkz","h_lodewijkz","h_snieder","h_stoof","h_vos","h_vos","h_werfhorst","h_werfhorst","h_werfhorst","h_werfhorst","h_wilke","i_gaalen","i_maas","i_maas","i_maas","j_blom","j_dessens","j_dijkstra","j_dijkstra","j_dijkstra","j_dijkstra","j_dijkstra","j_dijkstra","j_dijkstra","j_faber","j_gerris","j_gerris","j_gerris","j_huisman","j_jansen","j_jansen","j_janssen","j_ormel","j_ormel","j_ormel","j_park","j_peschar","j_peschar","j_peschar","j_peschar","j_plantenga","j_schippers","j_siegers","j_siegers","j_siegers","j_siegers","j_siegers","j_siegers","j_siegers","j_slaets","j_slaets","j_thijs","j_thijs","j_tolsma","j_tolsma","j_tolsma","j_tolsma","j_tolsma","j_tolsma","j_weesie","j_weesie","j_weesie","j_weesie","j_weesie","j_weesie","j_wit","j_zee","j_zuidersma","j_zuidersma","k_begall","k_institute","k_ivanova","k_muhler","k_muhler","k_phalet","k_phalet","k_phalet","k_sanders","k_wittebrood","k_wittebrood","l_adelman","l_baams","l_blommaert","l_blommaert","l_blommaert","l_dulk","l_hagendoorn","l_hagendoorn","l_hagendoorn","l_hagendoorn","l_hagendoorn","l_heyse","l_heyse","l_heyse","l_heyse","l_jans","l_jans","l_lammers","l_lammers","l_laninga-wijnen","l_leeuw","l_leeuw","l_liebrand","l_liebrand","l_steg","l_steg","m_assen","m_assen","m_brink","m_coenders","m_coenders","m_coenders","m_coenders","m_coenders","m_coenders","m_duijn","m_duijn","m_duijn","m_gesthuizen","m_gesthuizen","m_gesthuizen","m_gijsberts","m_goos","m_grotenhuis","m_grotenhuis","m_herweijer","m_huisman","m_kalmijn","m_kalmijn","m_kalmijn","m_kalmijn","m_kretzschmar","m_labussere","m_leeuwen","m_leeuwen","m_lubbers","m_lubbers","m_lubbers","m_lubbers","m_lubbers","m_lubbers","m_lubbers","m_lubbers","m_lubbers","m_mills","m_mills","m_mills","m_savelkoul","m_spreen","m_verkuyten","m_verkuyten","m_verkuyten","m_verkuyten","m_visser","m_wolbers","m_wolbers","m_wolbers","n_ellemers","n_ellemers","n_ellemers","n_graaf","n_graaf","n_graaf","n_graaf","n_spierings","n_spierings","n_steverink","n_steverink","n_steverink","n_steverink","n_steverink","p_dykstra","p_dykstra","p_dykstra","p_dykstra","p_dykstra","p_graaf","p_graaf","p_groenewegen","p_groenewegen","p_groenwegen","p_hodiamont","p_hodiamont","p_kleingeld","p_nieuwbeerta","p_nieuwbeerta","p_popping","p_scheepers","p_scheepers","p_scheepers","p_scheepers","p_sleegers","r_bosker","r_corten","r_holzhacker","r_mokken","r_mokken","r_stolk","r_torenvlied","r_torenvlied","r_torenvlied","r_torenvlied","r_torenvlied","r_torenvlied","r_usa)","r_veenstra","r_veenstra","r_veenstra","r_veenstra","r_velden","r_wielers","r_wielers","r_wippler","r_wippler","r_wippler","r_wippler","r_wippler","r_wittek","r_wittek","r_wittek","r_wittek","r_wittek","r_wittek","r_wittek","r_wittek","s_denters","s_geven","s_klosse","s_lange","s_lindenberg","s_lindenberg","s_lindenberg","s_lindenberg","s_lindenberg","s_lindenberg","s_lindenberg","s_rosenkranz","s_rosenkranz","s_sanders","s_sanders","s_slaets","s_stokman","s_suurmeijer","s_waslander","t_bol","t_lippe","t_lippe","t_lippe","t_moor","t_snijders","t_snijders","t_snijders","t_snijders","t_snijders","t_snijders","t_takacs","t_thomson","v_buskens","v_buskens","w_raub","w_ultee"],"to":["p_groenwegen","s_lindenberg","a_need","w_ultee","s_lindenberg","h_boeije","h_ganzeboom","j_siegers","l_dulk","r_wippler","t_lippe","b_buunk","d_bakker","d_vos","d_zhou","f_stokman","g_huitsing","h_emmerik","j_dijkstra","j_tolsma","l_liebrand","m_mas","m_mills","m_verkuyten","p_popping","r_bosker","r_leenders","r_veenstra","r_wittek","s_sanders","s_siegers","t_snijders","t_takacs","w_jager","w_raub","i_maas","h_flap","l_hagendoorn","p_dykstra","p_scheepers","w_vollebergh","l_hagendoorn","m_kalmijn","p_dykstra","t_knijn","w_raub","f_leeuw","r_wippler","m_grotenhuis","m_lubbers","n_graaf","w_ultee","b_volker","g_mollenhorst","k_begall","k_institute","p_dykstra","p_kleingeld","p_nieuwbeerta","r_wittek","t_lippe","w_raub","l_jans","l_steg","r_corten","v_buskens","t_lippe","m_verkuyten","d_nieboer","s_lindenberg","z_zeggelink","h_hermkens","j_siegers","n_steverink","d_vos","f_stokman","e_verbakel","g_kraaykamp","t_lippe","g_lodder","r_veenstra","g_lodder","n_steverink","p_jonge","f_stokman","r_mokken","b_volker","e_harteveld","f_tubergen","j_schippers","m_coenders","s_lange","t_bol","t_lippe","w_brug","c_tseung-wong","m_verkuyten","d_barrera","r_veenstra","g_kraaykamp","h_bekhuis","j_tolsma","p_hodiamont","p_scheepers","w_ultee","g_mollenhorst","h_flap","h_werfhorst","j_peschar","m_spreen","p_groenewegen","s_steinmetz","t_kuhn","t_snijders","v_schutjens","c_stechlich","t_snijders","w_raub","h_ganzeboom","i_maas","j_dijkstra","m_huisman","r_veenstra","d_graaf","f_stokman","w_ultee","f_stokman","t_snijders","h_flap","j_blom","w_ultee","h_ganzeboom","c_steglich","g_huitsing","r_veenstra","t_kretschmer","j_weesie","w_raub","t_snijders","w_raub","j_dijkstra","j_huisman","m_mills","r_veenstra","r_wielers","r_wittek","t_snijders","e_jonge","p_scheepers","m_verkuyten","j_siegers","s_lindenberg","t_snijders","i_maas","j_dijkstra","r_veenstra","v_buskens","w_raub","g_kraaykamp","h_flap","h_ganzeboom","j_jansen","d_vos","j_peschar","s_lindenberg","t_snijders","w_ultee","j_tolsma","s_kinsbergen","s_lindenberg","z_zeggelink","s_lindenberg","f_stokman","j_peschar","s_lindenberg","t_snijders","z_zeggelink","w_jager","r_torenvlied","w_raub","n_graaf","p_graaf","p_scheepers","w_ultee","r_veenstra","s_lindenberg","s_lange","w_brug","f_tubergen","i_maas","m_lubbers","t_lippe","p_scheepers","h_flap","t_lippe","w_raub","l_hagendoorn","m_verkuyten","w_raub","g_kraaykamp","m_visser","t_lippe","f_tubergen","m_verkuyten","j_zuidersma","l_heyse","r_wittek","h_ganzeboom","i_nagel","r_wippler","f_stokman","f_tazelaar","h_flap","j_ormel","j_peschar","k_sanders","l_liebrand","m_herweijer","p_popping","r_leenders","r_mokken","r_usa)","r_wielers","r_wippler","r_wittek","s_denters","s_lindenberg","t_snijders","t_thomson","w_hennen","w_raub","w_schuur","h_flap","h_ganzeboom","r_velden","r_wippler","t_snijders","w_raub","y_kops","h_flap","i_maas","j_weesie","m_coenders","m_verkuyten","n_ellemers","n_graaf","r_corten","t_lippe","t_stark","w_raub","w_ultee","l_hagendoorn","t_knijn","m_coenders","m_lubbers","p_scheepers","s_lindenberg","r_wittek","s_lindenberg","g_kraaykamp","j_dessens","r_wippler","j_peschar","r_wittek","s_lindenberg","s_siegers","j_dijkstra","r_veenstra","t_kretschmer","g_kraaykamp","h_bekhuis","j_tolsma","m_brink","m_gesthuizen","m_hek","m_lubbers","m_wolbers","n_graaf","n_spierings","p_graaf","r_koning","r_meuleman","r_veenstra","t_lippe","w_ultee","n_steverink","p_jonge","r_veenstra","t_snijders","h_snieder","m_mills","j_tolsma","l_dulk","t_lippe","p_graaf","w_ultee","j_siegers","s_lindenberg","s_sanders","s_siegers","h_ganzeboom","i_maas","j_blom","j_dagevos","j_jansen","j_siegers","j_weesie","k_muhler","l_leeuw","m_grotenhuis","m_kalmijn","m_leeuwen","p_dykstra","p_groenewegen","p_scheepers","r_wippler","t_lippe","t_snijders","v_schutjens","w_ultee","t_snijders","h_ganzeboom","h_hermkens","i_maas","i_nagel","j_jansen","j_lucassen","j_siegers","m_kalmijn","m_mills","n_graaf","p_graaf","r_velden","r_wippler","s_sanders","t_lippe","t_snijders","w_arts","w_ultee","y_kops","j_siegers","w_arts","j_thijs","m_labussere","t_bol","r_wippler","w_stroebe","m_mills","v_buskens","r_wippler","w_schuur","s_geven","t_bol","t_kuhn","t_leopold","s_lindenberg","m_kalmijn","m_kalmijn","m_leeuwen","t_lippe","w_ultee","r_wippler","m_duijn","m_huisman","r_veenstra","r_wittek","s_lindenberg","t_kretschmer","t_snijders","r_wippler","p_scheepers","p_sleegers","w_ultee","t_snijders","k_muhler","r_wippler","p_scheepers","s_lindenberg","t_snijders","w_heuvel","s_lindenberg","r_wielers","s_lindenberg","s_waslander","t_snijders","j_siegers","t_lippe","j_zee","l_leeuw","p_groenewegen","r_wippler","s_klosse","s_lindenberg","s_schippers","n_steverink","s_lindenberg","l_hagendoorn","m_verkuyten","m_gesthuizen","m_mas","n_spierings","p_scheepers","r_veenstra","s_kinsbergen","r_wippler","s_lindenberg","t_lippe","t_snijders","v_buskens","w_raub","t_lippe","p_groenewegen","l_heyse","r_wittek","t_lippe","t_lippe","m_kalmijn","r_wippler","t_snijders","l_hagendoorn","m_gijsberts","m_lubbers","w_raub","n_graaf","w_ultee","m_verkuyten","r_veenstra","m_lubbers","m_savelkoul","p_scheppers","t_lippe","m_gijsberts","m_lubbers","m_verkuyten","t_knijn","w_raub","m_mills","r_holzhacker","r_wittek","s_otten","l_steg","v_buskens","p_graaf","w_ultee","r_veenstra","r_torenvlied","s_siegers","p_popping","w_raub","s_lindenberg","v_buskens","r_veenstra","s_lindenberg","r_meuleman","m_lubbers","m_verkuyten","n_graaf","p_scheepers","t_lippe","w_raub","m_mills","r_veenstra","t_snijders","m_wolbers","p_scheepers","w_ultee","m_lubbers","t_lippe","n_graaf","p_scheepers","r_mokken","r_veenstra","p_graaf","t_leopold","w_raub","w_ultee","v_buskens","t_bol","r_wittek","z_lippenyi","m_lubbers","m_savelkoul","m_verkuyten","n_graaf","n_spierings","p_scheepers","p_scheppers","r_eisenga","t_lippe","r_stolk","r_veenstra","r_wittek","p_scheppers","t_snijders","p_scheepers","r_veenstra","t_stark","w_raub","t_lippe","n_graaf","p_graaf","w_ultee","t_stark","v_buskens","w_przepiorka","p_graaf","p_nieuwbeerta","p_scheepers","w_ultee","p_scheepers","r_veenstra","p_jonge","r_wittek","s_lindenberg","s_slaets","t_snijders","r_wittek","s_lindenberg","t_knijn","t_lippe","w_raub","r_wippler","w_ultee","s_lindenberg","t_snijders","s_lindenberg","p_scheepers","w_ultee","t_lippe","t_lippe","w_raub","r_leenders","p_scheepers","p_sleegers","w_ultee","w_vollebergh","w_ultee","r_veenstra","s_ruiter","r_wittek","t_snijders","w_schuur","r_wittek","r_torenvlied","s_siegers","t_lippe","t_thomson","v_buskens","w_raub","r_wittek","s_lindenberg","t_kretschmer","t_snijders","w_vollebergh","y_kops","r_wittek","s_lindenberg","r_wippler","w_raub","w_schuur","w_stroebe","w_ultee","s_lindenberg","s_otten","s_siegers","s_suurmeijer","t_takacs","v_schuur","w_raub","z_lippenyi","t_snijders","t_bol","s_schippers","w_brug","s_lindenberg","t_knijn","t_snijders","w_heuvel","w_molenaar","w_raub","z_zeggelink","v_buskens","w_raub","s_siegers","t_lippe","t_snijders","t_snijders","v_schuur","t_snijders","t_leopold","v_buskens","w_raub","w_ultee","v_buskens","t_snijders","v_schutjens","w_heuvel","w_raub","w_sodeur","z_zeggelink","w_raub","w_raub","w_przepiorka","w_raub","w_raub","w_ultee"],"value":[1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,3,1,1,3,1,1,2,1,1,2,1,1,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,4,3,1,1,1,1,1,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,4,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,2,2,1,1,2,2,2,1,1,1,2,1,1,1,1,1,2,1,1,3,2,2,2,1,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,3,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,4,1,1,1,1,1,2,1,2,1,5,1,2,1,3,1,3,6,1,2,4,1,1,1,1,2,1,2,1,1,2,1,3,2,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,1,3,1,2,1,4,1,1,1,1,2,2,1,1,2,1,1,2,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,2,1,2,1,1,2,1,1,1,2,2,1,1,2,2,5,1,3,1,2,1,1,1,1,2,1,1,1,2,2,1,1,1,2,2,1,3,1,1,1,1,1,1,2,1,2,1,1,1,1,2,1,1,2,1,1,5,2,2,1,1,1,7,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,2,1,5,1,3,1,1,1,1,1,2,1,3,1,1,1,1,3,1,1,1,1,1,1,1,1,1,3,2,7,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,2,1,2,1,8,1,1,1,1,1,2,1,1,1,1,2,1,1,1,1,2,3,1,2,1,1,1,3,2,3,1,1,1,1,1,2,1,1,3,1,1,2,1,1,1,1,1,1,2,4,2,4,1,1,1,1,1,4,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,7,1,1,1,1,1,1,1,1,1,1,1,1,1,8,1,1,1,1,1,1,1,1,1,1,1,4,1,1,1,1,1,1,1,1,1,1,1,1,1,5,1,5,2,2,1,1,2,2,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,4,1,1,1,1,3,3,1,1,1,1,1,1,1,2,2,1,1,4,1,1,4,2,1,1,2,3,8,1,1],"title":["n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 3","n: 1","n: 1","n: 3","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 1","n: 3","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 4","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 6","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 4","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 2","n: 1","n: 1","n: 2","n: 2","n: 2","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 3","n: 2","n: 2","n: 2","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 4","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 2","n: 1","n: 5","n: 1","n: 2","n: 1","n: 3","n: 1","n: 3","n: 6","n: 1","n: 2","n: 4","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 3","n: 2","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 3","n: 1","n: 2","n: 1","n: 4","n: 1","n: 1","n: 1","n: 1","n: 2","n: 2","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 5","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 4","n: 2","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 2","n: 2","n: 1","n: 1","n: 2","n: 2","n: 5","n: 1","n: 3","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 2","n: 2","n: 1","n: 1","n: 1","n: 2","n: 2","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 1","n: 1","n: 5","n: 2","n: 2","n: 1","n: 1","n: 1","n: 7","n: 1","n: 1","n: 1","n: 1","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 5","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 3","n: 2","n: 7","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 2","n: 2","n: 1","n: 2","n: 1","n: 8","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 2","n: 3","n: 1","n: 2","n: 1","n: 1","n: 1","n: 3","n: 2","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 3","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 4","n: 2","n: 4","n: 1","n: 1","n: 1","n: 1","n: 1","n: 4","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 7","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 8","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 4","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 5","n: 1","n: 5","n: 2","n: 2","n: 1","n: 1","n: 2","n: 2","n: 1","n: 1","n: 1","n: 2","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 3","n: 1","n: 4","n: 1","n: 1","n: 1","n: 1","n: 3","n: 3","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 1","n: 2","n: 2","n: 1","n: 1","n: 4","n: 1","n: 1","n: 4","n: 2","n: 1","n: 1","n: 2","n: 3","n: 8","n: 1","n: 1"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot"},"manipulation":{"enabled":false},"interaction":{"hover":true,"zoomSpeed":1},"edges":{"smooth":false},"layout":{"randomSeed":42},"physics":{"stabilization":true},"groups":{"useDefaultGroups":true}},"groups":null,"width":"100%","height":"1000px","idselection":{"enabled":false,"style":"width: 150px; height: 26px","useLabels":true,"main":"Select by id"},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)","highlight":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);","highlight":{"enabled":true,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":false,"fit":false,"resetHighlight":true,"clusterOptions":null,"keepCoord":true,"labelSuffix":"(cluster)"}},"evals":[],"jsHooks":{"render":[{"code":"\n    function(el) {\n      el.style.background = '#ffffff';\n      el.style.borderRadius = '14px';\n      el.style.boxShadow = '0 12px 35px rgba(0,0,0,0.18)';\n      el.style.padding = '10px';\n      el.style.border = '1px solid #e6e6e6';\n    }\n  ","data":null}]}}</script>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ29sbGFicyBWaXoiCiNiaWJsaW9ncmFwaHk6IHJlZmVyZW5jZXMuYmliCmF1dGhvcjogIkJhcyBIb2ZzdHJhIgotLS0KCgoKYGBge3IsIGdsb2JhbHNldHRpbmdzLCBlY2hvPUZBTFNFLCB3YXJuaW5nPUZBTFNFLCByZXN1bHRzPSdoaWRlJ30KbGlicmFyeShrbml0cikKCmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvID0gVFJVRSkKb3B0c19jaHVuayRzZXQodGlkeS5vcHRzPWxpc3Qod2lkdGguY3V0b2ZmPTEwMCksdGlkeT1UUlVFLCB3YXJuaW5nID0gRkFMU0UsIG1lc3NhZ2UgPSBGQUxTRSxjb21tZW50ID0gIiM+IiwgY2FjaGU9VFJVRSwgY2xhc3Muc291cmNlPWMoInRlc3QiKSwgY2xhc3Mub3V0cHV0PWMoInRlc3QyIikpCm9wdGlvbnMod2lkdGggPSAxMDApCnJnbDo6c2V0dXBLbml0cigpCgoKCmNvbG9yaXplIDwtIGZ1bmN0aW9uKHgsIGNvbG9yKSB7c3ByaW50ZigiPHNwYW4gc3R5bGU9J2NvbG9yOiAlczsnPiVzPC9zcGFuPiIsIGNvbG9yLCB4KSB9CgpgYGAKCmBgYHtyIGtsaXBweSwgZWNobz1GQUxTRSwgaW5jbHVkZT1UUlVFfQprbGlwcHk6OmtsaXBweShwb3NpdGlvbiA9IGMoJ3RvcCcsICdyaWdodCcpKQoja2xpcHB5OjprbGlwcHkoY29sb3IgPSAnZGFya3JlZCcpCiNrbGlwcHk6OmtsaXBweSh0b29sdGlwX21lc3NhZ2UgPSAnQ2xpY2sgdG8gY29weScsIHRvb2x0aXBfc3VjY2VzcyA9ICdEb25lJykKYGBgCgpMYXN0IGNvbXBpbGVkIG9uIGByIGZvcm1hdChTeXMudGltZSgpLCAnJUIsICVZJylgCgo8YnI+CgoKCgpTb21lIHBhY2thZ2VzIG5lY2Vzc2FyeSB0byBydW4gdGhlIGFuYWx5c2VzLgoKYGBge3IgcGFja2FnZXN9CnJtKGxpc3QgPSBscygpKQpsaWJyYXJ5KCJncm91bmRob2ciKQpncm91bmRob2cubGlicmFyeSgiCiAgICAgICAgICAgICAgICAgIGxpYnJhcnkoJ29wZW54bHN4JykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgnZmxleHRhYmxlJykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgnZHBseXInKQogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCdzdHJpbmdkaXN0JykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgnc3RyaW5naScpCiAgICAgICAgICAgICAgICAgIGxpYnJhcnkoJ3N0cmluZ3InKQogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCdnZ3JhcGgnKQogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCd0aWR5Z3JhcGgnKQogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCdpZ3JhcGgnKQogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCd2aXNOZXR3b3JrJykKICAgICAgICAgICAgICAgICAgIiwgCiAgICAgICAgICAgICAgICAgICIyMDI1LTA0LTEwIikKCmBgYAoKIyBEYXRhCgpMb2FkIHRoZSBvdXRwdXQgZGF0YSB3ZSBnZW5lcmF0ZWQgYmVmb3JlCgpgYGB7ciBkYXRhbG9hZGluZ30KbG9hZCgiZGF0YS9vdXRwdXRfZGF0YS9lbF9zdGF0aWMucmRhIikKbG9hZCgiZGF0YS9vdXRwdXRfZGF0YS9ub2Rlc19zdGF0aWMucmRhIikKbG9hZCgiZGF0YS9vdXRwdXRfZGF0YS9lbF9keW4xLnJkYSIpCmxvYWQoImRhdGEvb3V0cHV0X2RhdGEvZWxfZHluMi5yZGEiKQpsb2FkKCJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjMucmRhIikKbG9hZCgiZGF0YS9vdXRwdXRfZGF0YS9lbF9keW40LnJkYSIpCmxvYWQoImRhdGEvb3V0cHV0X2RhdGEvZWxfZHluNS5yZGEiKQpsb2FkKCJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjYucmRhIikKbG9hZCgiZGF0YS9vdXRwdXRfZGF0YS9lbF9keW43LnJkYSIpCgpgYGAKCiMgU3RhbmRhcmQgVml6CgpTb21lIHN0YXJ0aW5nIHZpei4KCmBgYHtyIHZpel9zdGF0aWN9CgojIGdlbiBncmFwaApnIDwtIGdyYXBoX2Zyb21fZGF0YV9mcmFtZShlZGdlbGlzdDEsIGRpcmVjdGVkID0gRkFMU0UpCgojIGFkZCBub2RlIGNoYXJhY3RlcmlzdGljcyBmZWN1bmRpdHkgKGhvdyBtYW55IHBoZHMpCmhlYWQoVihnKSRuYW1lKQpjb2xuYW1lcyhub2RlcylbMV0gPC0gIm5hbWUiClYoZykkZmVjIDwtIG5vZGVzJEZyZXFbbWF0Y2goVihnKSRuYW1lLCBub2RlcyRuYW1lKV0KaGVhZChWKGcpJGZlYykKCiMgZ2VuZXJhdGUgdGhlIGdyYXBoCmdncmFwaChnLCBsYXlvdXQgPSAiZnIiKSArCiAgZ2VvbV9lZGdlX2xpbmsoYWVzKHdpZHRoID0gbiksCiAgICAgICAgICAgICAgICAgY29sb3IgPSAiZ3JleTUwIiwKICAgICAgICAgICAgICAgICBhbHBoYSA9IC41KSArCiAgc2NhbGVfZWRnZV93aWR0aChyYW5nZSA9IGMoMC4yLCAzKSkgKwogIGdlb21fbm9kZV9wb2ludChhZXMoc2l6ZSA9IGZlYyksCiAgICAgICAgICAgICAgICAgIGNvbG9yID0gImJsYWNrIiwKICAgICAgICAgICAgICAgICAgZmlsbCA9ICJzdGVlbGJsdWUiLAogICAgICAgICAgICAgICAgICBzaGFwZSA9IDIxLAogICAgICAgICAgICAgICAgICBhbHBoYSA9IC45KSArCiAgc2NhbGVfc2l6ZShyYW5nZSA9IGMoMywgMTQpKSArCiAgZ2VvbV9ub2RlX3RleHQoYWVzKGxhYmVsID0gbmFtZSksCiAgICAgICAgICAgICAgICAgcmVwZWwgPSBUUlVFLAogICAgICAgICAgICAgICAgIHNpemUgPSAzKSArCiAgdGhlbWVfdm9pZCgpICsKICBnZ3RpdGxlKCJTdXBlcnZpc29yIGNvbGxhYm9yYXRpb25zOiAxOTkwLTIwMjUiKSArCiAgICAgIHRoZW1lKAogICAgICAgIHBsb3QubWFyZ2luID0gbWFyZ2luKDEwLCAxMCwgMTAsIDEwKQogICAgICApCgpgYGAKCgoKIyBOaWNlciBWaXoKCmBgYHtyIHZpel9zaGlueX0KCiMgbnVtYmVyIG9mIHRpZXMgZm9yIGluZm8gb24gaG92ZXIKbm9kZV9jb3VudCA8LSBkZWdyZWUoZykKCiMgLS0tIE5vZGVzIC0tLQpub2RlcyA8LSBkYXRhLmZyYW1lKAogIGlkICAgID0gVihnKSRuYW1lLAogIGxhYmVsID0gIiIsCiAgdmFsdWUgPSBWKGcpJGZlYywKICB0aXRsZSA9IHNwcmludGYoCiAgICAiPGI+JXM8L2I+PGJyPlBoRHM6ICVzPGJyPkNvbGxhYnM6ICVzIiwKICAgIFYoZykkbmFtZSwKICAgIFYoZykkZmVjLAogICAgbm9kZV9jb3VudAogICksCiAgc3RyaW5nc0FzRmFjdG9ycyA9IEZBTFNFCikKCiMgLS0tIEVkZ2VzIC0tLQplZCA8LSBhc19kYXRhX2ZyYW1lKGcsIHdoYXQgPSAiZWRnZXMiKQplZGdlcyA8LSBkYXRhLmZyYW1lKAogIGZyb20gID0gZWQkZnJvbSwKICB0byAgICA9IGVkJHRvLAogIHZhbHVlID0gZWQkbiwKICB0aXRsZSA9IHBhc3RlMCgibjogIiwgZWQkbiksCiAgc3RyaW5nc0FzRmFjdG9ycyA9IEZBTFNFCikKbGlicmFyeShodG1sdG9vbHMpCiMgLS0tIFBsb3QgLS0tCnRhZ0xpc3QoCiAgdGFncyRoMygKICAgICJTdXBlcnZpc29yIGNvbGxhYm9yYXRpb25zOiAxOTkwLTIwMjUiLAogICAgc3R5bGUgPSAiCiAgICAgIGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmOwogICAgICBmb250LXdlaWdodDogNjAwOwogICAgICBtYXJnaW4tYm90dG9tOiAxMHB4OwogICAgIgogICksCnZpc05ldHdvcmsobm9kZXMsIGVkZ2VzLCBoZWlnaHQgPSAiMTAwMHB4Iiwgd2lkdGggPSAiMTAwJSIpICU+JQogIHZpc0ludGVyYWN0aW9uKGhvdmVyID0gVFJVRSkgJT4lCiAgdmlzT3B0aW9ucyhoaWdobGlnaHROZWFyZXN0ID0gVFJVRSkgJT4lCiAgdmlzRWRnZXMoc21vb3RoID0gRkFMU0UpICU+JQogIHZpc0xheW91dChyYW5kb21TZWVkID0gNDIpICU+JQogIHZpc1BoeXNpY3Moc3RhYmlsaXphdGlvbiA9IFRSVUUpICU+JQogIHZpc0dyb3Vwcyhncm91cG5hbWUgPSAiZGVmYXVsdCIpICU+JQogIGh0bWx3aWRnZXRzOjpvblJlbmRlcigiCiAgICBmdW5jdGlvbihlbCkgewogICAgICBlbC5zdHlsZS5iYWNrZ3JvdW5kID0gJyNmZmZmZmYnOwogICAgICBlbC5zdHlsZS5ib3JkZXJSYWRpdXMgPSAnMTRweCc7CiAgICAgIGVsLnN0eWxlLmJveFNoYWRvdyA9ICcwIDEycHggMzVweCByZ2JhKDAsMCwwLDAuMTgpJzsKICAgICAgZWwuc3R5bGUucGFkZGluZyA9ICcxMHB4JzsKICAgICAgZWwuc3R5bGUuYm9yZGVyID0gJzFweCBzb2xpZCAjZTZlNmU2JzsKICAgIH0KICAiKQopCmBgYAoKCgoKCgoKCg==</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("collabs.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -11,3 +11,4 @@ ggraph
 tidygraph
 igraph
 visNetwork
+htmltools

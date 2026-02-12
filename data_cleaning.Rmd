@@ -32,16 +32,229 @@ Last compiled on `r format(Sys.time(), '%B, %Y')`
 
 ----
   
-This is just an example page of your `r colorize("lab journal", "red")`.
-  
+# Packages
 
-----
+Some packages necessary to run the analyses.
 
-Data cleaning
+```{r packages}
+rm(list = ls())
+library("groundhog")
+groundhog.library("
+                  library('openxlsx')
+                  library('flextable')
+                  library('dplyr')
+                  library('stringdist')
+                  library('stringi')
+                  library('stringr')
+                  library('ggraph')
+                  library('tidygraph')
+                  library('igraph')
+                  ", 
+                  "2025-04-10")
+```
+# Data
 
-```{r}
-print("Hello Lab Journal")
+Load the data, show what it looks like.
+
+```{r dataloading}
+df <- read.xlsx("data/input_data/ICS_alumni_Jan28_2026_bas.xlsx")
+flextable(head(df))
 ```
 
+# Cleaning
 
+Some string cleaning of supervisors, most likely still contains errors, but this is already pretty involved.
+
+
+```{r datacleaning}
+# first get the appended list of all unique strings in promotor 1-4
+promotors <-     unique(c(df[, c("Promotor.1")],
+                    df[, c("Promotor.2")],
+                    df[, c("Promotor.3")],
+                    df[, c("Promotor.4")]))
+
+# some string cleaning
+names <- gsub("\\s*\\([^)]*\\)", "", promotors) # remove everything between brackets rug/eur/etc.
+names <- gsub("\\b(dr|prof)\\.?", "", names, ignore.case = TRUE) # remove dr and prof
+names <- tolower(names) #lower case
+names <- trimws(gsub("\\s+", " ", names)) #trim any white spaces
+
+# some manual cleaning where my decision rukles don't work
+names <- data.frame(names)
+colnames(names)[1] <- "name"
+names$name <- ifelse(names$name == "need", "a need", names$name)
+names$name <- ifelse(names$name == "kraaykamp", "g kraaykamp", names$name)
+names$name <- ifelse(names$name == "a.flache", "a. flache", names$name)
+names$name <- ifelse(names$name == "l.heyse", "l. heyse", names$name)
+names$name <- ifelse(names$name == "r. veenstra (rug", "r. veenstra", names$name)
+names$name <- ifelse(names$name == "j.slaets", "j. slaets", names$name)
+names$name <- ifelse(names$name == "scheepers", "p. scheepers", names$name)
+
+# now get the last names
+names <- data.frame(names[!is.na(names$name), ])
+colnames(names)[1] <- "name"
+names <- names %>%
+  mutate(last_name = word(name, -1))
+
+# get first initial
+names <- names %>%
+  mutate(first_letter = str_sub(name, 1, 1))
+
+# remove diacritics
+names$name_clean <- stri_trans_general(names$last_name, "Latin-ASCII")
+
+# paste firs tinitial last name together
+names$canon <- paste0(names$first_letter, "_", names$name_clean)
+
+# bind to unique strings in promotors 1-4
+promotors <- data.frame(promotors)
+promotors <- promotors[!is.na(promotors$promotors), ]
+promotors <- data.frame(cbind(promotors, names[, c("canon")]))
+colnames(promotors)[2] <- "canon"
+
+flextable(head(promotors))
+```
+
+# Edgelist static
+
+Create edgelists now that we have canonical names.
+
+```{r edgelists}
+
+edges <- df[, c("Promotor.1", "Promotor.2", "Promotor.3", "Promotor.4")]
+
+edges <- left_join(edges, promotors, by = c("Promotor.1" = "promotors"))
+edges <- left_join(edges, promotors, by = c("Promotor.2" = "promotors"))
+edges <- left_join(edges, promotors, by = c("Promotor.3" = "promotors"))
+edges <- left_join(edges, promotors, by = c("Promotor.4" = "promotors"))
+
+edges <- edges[, c("canon.x", "canon.y", "canon.x.x", "canon.y.y")]
+colnames(edges) <- c("sup1", "sup2", "sup3", "sup4")
+
+sup12 <- edges[, c(1, 2)]
+sup12 <- sup12 %>% filter(complete.cases(.))
+colnames(sup12) <- c("from", "to")
+
+sup13 <- edges[, c(1, 3)]
+sup13 <- sup13 %>% filter(complete.cases(.))
+colnames(sup13) <- c("from", "to")
+
+sup14 <- edges[, c(1, 4)]
+sup14 <- sup14 %>% filter(complete.cases(.))
+colnames(sup14) <- c("from", "to")
+
+sup23 <- edges[, c(2, 3)]
+sup23 <- sup23 %>% filter(complete.cases(.))
+colnames(sup23) <- c("from", "to")
+
+sup24 <- edges[, c(2, 4)]
+sup24 <- sup24 %>% filter(complete.cases(.))
+colnames(sup24) <- c("from", "to")
+
+sup34 <- edges[, c(3, 4)]
+sup34 <- sup34 %>% filter(complete.cases(.))
+colnames(sup34) <- c("from", "to")
+
+edgelist <- rbind(sup12, sup13, sup14, sup23, sup24, sup34)
+nodes <- c(edges[, c("sup1")], edges[, c("sup2")], edges[, c("sup3")], edges[, c("sup4")])
+nodes <- data.frame(table(nodes))
+
+edgelist1 <- edgelist %>%
+        count(pmin(from, to), pmax(from, to))
+names(edgelist1)[1:2] <- c("from", "to")
+
+flextable(head(edgelist1))
+
+```
+
+# Nodes
+
+And node characteristic: how many PhDs supervised.
+
+```{r nodes}
+
+nodes <- c(edges[, c("sup1")], edges[, c("sup2")], edges[, c("sup3")], edges[, c("sup4")])
+nodes <- data.frame(table(nodes))
+
+```
+
+# Edgelists dynamic
+
+```{r edgesdynamic}
+
+edgesdyn <- cbind(edges, df[, c("Promotiejaar")])
+colnames(edgesdyn)[5] <- "phd_year"
+
+edgef <- function(df, timemax, timemin) {
+  
+  sups <- edgesdyn[edgesdyn$phd_year < timemax, ]
+  sups <- sups[sups$phd_year > timemin, ]
+  sups12 <- sups[, c(1, 2)]
+  sups12 <- sups12 %>% filter(complete.cases(.))
+  colnames(sups12) <- c("from", "to")
+  
+  sups13 <- sups[, c(1, 3)]
+  sups13 <- sups13 %>% filter(complete.cases(.))
+  colnames(sups13) <- c("from", "to")
+  
+  sups14 <- sups[, c(1, 4)]
+  sups14 <- sups14 %>% filter(complete.cases(.))
+  colnames(sups14) <- c("from", "to")
+  
+  sups23 <- sups[, c(2, 3)]
+  sups23 <- sups23 %>% filter(complete.cases(.))
+  colnames(sups23) <- c("from", "to")
+  
+  sups24 <- sups[, c(2, 4)]
+  sups24 <- sups24 %>% filter(complete.cases(.))
+  colnames(sups24) <- c("from", "to")
+  
+  sups34 <- sups[, c(3, 4)]
+  sups34 <- sups34 %>% filter(complete.cases(.))
+  colnames(sups34) <- c("from", "to")
+  
+  edg <- rbind(sups12, sups13, sups14, sups23, sups24, sups34)
+  
+  edg <- edg %>%
+        count(pmin(from, to), pmax(from, to))
+  colnames(edg)[1:2] <- c("from", "to")
+  
+  return(edg)
+  
+}
+
+# we want:
+# 1995-1999
+# 2000-2004
+# 2005-2009
+# 2010-2014
+# 2015-2019
+# 2020-2025
+
+t1 <- edgef(edgesdyn, 1995, 1989)
+t2 <- edgef(edgesdyn, 2000, 1994)
+t3 <- edgef(edgesdyn, 2005, 1999)
+t4 <- edgef(edgesdyn, 2010, 2004)
+t5 <- edgef(edgesdyn, 2015, 2009)
+t6 <- edgef(edgesdyn, 2020, 2014)
+t7 <- edgef(edgesdyn, 2026, 2019)
+
+
+```
+
+# Save
+
+```{r save DFs}
+
+save(edgelist1, file = "data/output_data/el_static.rda")
+save(t1, file = "data/output_data/el_dyn1.rda")
+save(t2, file = "data/output_data/el_dyn2.rda")
+save(t3, file = "data/output_data/el_dyn3.rda")
+save(t4, file = "data/output_data/el_dyn4.rda")
+save(t5, file = "data/output_data/el_dyn5.rda")
+save(t6, file = "data/output_data/el_dyn6.rda")
+save(t7, file = "data/output_data/el_dyn7.rda")
+save(nodes, file = "data/output_data/nodes_static.rda")
+
+```
 

@@ -14,8 +14,14 @@ navbar:
       menu:
       - text: "Data cleaning"
         href: data_cleaning.html
-        
+    - text: "Visualization"
+      menu:
+      - text: "Collabs Viz"
+        href: collabs.html
+      - text: "Genealogy Viz"
+        href: genea.html
         # here, other .Rmds can be added
+
 
 
   right:

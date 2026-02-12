@@ -14,7 +14,7 @@
 
 <title>Data cleaning</title>
 
-<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -42,8 +42,10 @@
 <link href="site_libs/primer-tooltips-1.4.0/build.css" rel="stylesheet" />
 <link href="site_libs/klippy-0.0.0.9500/css/klippy.min.css" rel="stylesheet" />
 <script src="site_libs/klippy-0.0.0.9500/js/klippy.min.js"></script>
-<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet" />
+<script src="site_libs/tabwid-1.1.3/tabwid.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -354,6 +356,21 @@ div.tocify {
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="collabs.html">Collabs Viz</a>
+    </li>
+    <li>
+      <a href="genea.html">Genealogy Viz</a>
+    </li>
+  </ul>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -391,17 +408,216 @@ div.tocify {
   addClassKlippyTo("pre.r, pre.markdown");
   addKlippy('right', 'top', 'auto', '1', 'Copy code', 'Copied!');
 </script>
-<p>Last compiled on October, 2025</p>
+<p>Last compiled on February, 2026</p>
 <p><br></p>
 <hr />
-<p>This is just an example page of your <span style="color: red;">lab
-journal</span>.</p>
-<hr />
-<p>Data cleaning</p>
-<pre class="r test"><code>print(&quot;Hello Lab Journal&quot;)</code></pre>
-<pre class="test2"><code>#&gt; [1] &quot;Hello Lab Journal&quot;</code></pre>
+<div id="packages" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Packages</h1>
+<p>Some packages necessary to run the analyses.</p>
+<pre class="r test"><code>rm(list = ls())
+library(&quot;groundhog&quot;)
+groundhog.library(&quot;
+                  library(&#39;openxlsx&#39;)
+                  library(&#39;flextable&#39;)
+                  library(&#39;dplyr&#39;)
+                  library(&#39;stringdist&#39;)
+                  library(&#39;stringi&#39;)
+                  library(&#39;stringr&#39;)
+                  library(&#39;ggraph&#39;)
+                  library(&#39;tidygraph&#39;)
+                  library(&#39;igraph&#39;)
+                  &quot;,
+    &quot;2025-04-10&quot;)</code></pre>
+</div>
+<div id="data" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Data</h1>
+<p>Load the data, show what it looks like.</p>
+<pre class="r test"><code>df &lt;- read.xlsx(&quot;data/input_data/ICS_alumni_Jan28_2026_bas.xlsx&quot;)
+flextable(head(df))</code></pre>
+<div class="tabwid"><style>.cl-293d31ba{}.cl-29319f8a{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-29364526{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-29364530{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-29366b5a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-29366b64{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-29366b6e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-29366b6f{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-29366b78{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-29366b79{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing='true' class='cl-293d31ba'><thead><tr style="overflow-wrap:break-word;"><th class="cl-29366b5a"><p class="cl-29364526"><span class="cl-29319f8a">ICSProefschrift.nr</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Voornaam</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Tussenvoegsel</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Achternaam</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">geslacht</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">nationaliteit</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">jaargroep</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">studierichting</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">1e.functie.ICS</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">1e.functie.na.ICS</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">land.1e.functie.na.ICS</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">huidig.werkveld.(09-2025)</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">huidige.functie.(09-2025)</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">land.huidige.functie</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Titel.Proefschrift</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Promotor.1</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Promotor.2</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Promotor.3</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Promotor.4</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Promotiedatum</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">Promotiejaar</span></p></th><th class="cl-29366b64"><p class="cl-29364530"><span class="cl-29319f8a">X22</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-29366b6e"><p class="cl-29364526"><span class="cl-29319f8a">1</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Kees</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">van</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Liere</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">m</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederlands</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1986</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Sociologie</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">ICS aio 1986 RUG</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Onderzoeker Algemene Rekenkamer</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Gepensioneerd (eerder beleid en advies)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Gepensioneerd (eerder Senior Adviseur Gemeente Rotterdam)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Lastige Leerlingen. Een empirisch onderzoek naar sociale oorzaken van probleemgedrag op basisscholen.</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">S. Lindenberg (RUG)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">F. Stokman (RUG)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">13-9-1990</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1990</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-29366b6e"><p class="cl-29364526"><span class="cl-29319f8a">2</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Marco</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">van</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Leeuwen</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">m</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederlands</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1986</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Geschiedenis</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">ICS aio 1986 UU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">pas 1996? Senior researcher IISH</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Academie</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Hoogleraar UU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Bijstand in Amsterdam, ca. 1800 - 1850. Armenzorg als beheersings  en overlevingsstrategie.</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">R. Wippler (UU)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">J.A. Faber (UvA)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">12-10-1990</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1990</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-29366b6e"><p class="cl-29364526"><span class="cl-29319f8a">3</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Ineke</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Maas</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">v</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederlands</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1986</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Sociologie</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">ICS aio 1986 UU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Postdoc Max-Planck-Institut für Bildungsforschung</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Duitsland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Academie</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">UHD UU en bijzonder hoogleraar VU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Deelname aan podiumkunsten via de podia, de media en actieve beoefening. Substitutie of leereffecten?</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">R. Wippler (UU)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">2-11-1990</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1990</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-29366b6e"><p class="cl-29364526"><span class="cl-29319f8a">4</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Marjolein</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Broese van Groenou</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">v</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederlands</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1986</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Psychologie</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">ICS aio 1986 UU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Senior Researcher VU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Academie</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Hoogleraar VU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Gescheiden Netwerken. De relaties met vrienden en verwanten na echtscheiding</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">F. Tazelaar (UU)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">F. Stokman (RUG)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">H. Flap (UU)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">8-2-1991</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1991</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-29366b6e"><p class="cl-29364526"><span class="cl-29319f8a">5</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Jan</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">van den</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Bos</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">m</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Nederlands</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1986</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">ICS aio 1986 UU</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">Dutch EC Policy Making. A Model Guided Approach to Coordination and Negotiation.</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">R. Wippler (UU)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">F. Stokman (RUG)</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">26-4-1991</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a">1991</span></p></td><td class="cl-29366b6f"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-29366b78"><p class="cl-29364526"><span class="cl-29319f8a">6</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Karin</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Sanders</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">v</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Nederlands</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">1987</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Psychologie</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">ICS aio 1987 RUG</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">UD en postdoc UU</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Nederland</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Academie</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Hoogleraar UNSW Business School</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Australië</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">Vrouwelijke Pioniers. Vrouwen en mannen met een 'mannelijke' hogere beroepsopleiding aan het begin van hun loopbaan.</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">S. Lindenberg (RUG)</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">A. van Doorne-Huiseks (LUW)</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">2-5-1991</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a">1991</span></p></td><td class="cl-29366b79"><p class="cl-29364530"><span class="cl-29319f8a"></span></p></td></tr></tbody></table></div>
+</div>
+<div id="cleaning" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Cleaning</h1>
+<p>Some string cleaning of supervisors, most likely still contains
+errors, but this is already pretty involved.</p>
+<pre class="r test"><code># first get the appended list of all unique strings in promotor 1-4
+promotors &lt;- unique(c(df[, c(&quot;Promotor.1&quot;)], df[, c(&quot;Promotor.2&quot;)], df[, c(&quot;Promotor.3&quot;)], df[, c(&quot;Promotor.4&quot;)]))
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRGF0YSBjbGVhbmluZyIKI2JpYmxpb2dyYXBoeTogcmVmZXJlbmNlcy5iaWIKYXV0aG9yOiAiQmFzIEhvZnN0cmEiCi0tLQoKCgpgYGB7ciwgZ2xvYmFsc2V0dGluZ3MsIGVjaG89RkFMU0UsIHdhcm5pbmc9RkFMU0UsIHJlc3VsdHM9J2hpZGUnfQpsaWJyYXJ5KGtuaXRyKQoKa25pdHI6Om9wdHNfY2h1bmskc2V0KGVjaG8gPSBUUlVFKQpvcHRzX2NodW5rJHNldCh0aWR5Lm9wdHM9bGlzdCh3aWR0aC5jdXRvZmY9MTAwKSx0aWR5PVRSVUUsIHdhcm5pbmcgPSBGQUxTRSwgbWVzc2FnZSA9IEZBTFNFLGNvbW1lbnQgPSAiIz4iLCBjYWNoZT1UUlVFLCBjbGFzcy5zb3VyY2U9YygidGVzdCIpLCBjbGFzcy5vdXRwdXQ9YygidGVzdDIiKSkKb3B0aW9ucyh3aWR0aCA9IDEwMCkKcmdsOjpzZXR1cEtuaXRyKCkKCgoKY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0KCmBgYAoKYGBge3Iga2xpcHB5LCBlY2hvPUZBTFNFLCBpbmNsdWRlPVRSVUV9CmtsaXBweTo6a2xpcHB5KHBvc2l0aW9uID0gYygndG9wJywgJ3JpZ2h0JykpCiNrbGlwcHk6OmtsaXBweShjb2xvciA9ICdkYXJrcmVkJykKI2tsaXBweTo6a2xpcHB5KHRvb2x0aXBfbWVzc2FnZSA9ICdDbGljayB0byBjb3B5JywgdG9vbHRpcF9zdWNjZXNzID0gJ0RvbmUnKQpgYGAKCkxhc3QgY29tcGlsZWQgb24gYHIgZm9ybWF0KFN5cy50aW1lKCksICclQiwgJVknKWAKCjxicj4KCi0tLS0KICAKVGhpcyBpcyBqdXN0IGFuIGV4YW1wbGUgcGFnZSBvZiB5b3VyIGByIGNvbG9yaXplKCJsYWIgam91cm5hbCIsICJyZWQiKWAuCiAgCgotLS0tCgpEYXRhIGNsZWFuaW5nCgpgYGB7cn0KcHJpbnQoIkhlbGxvIExhYiBKb3VybmFsIikKYGBgCgoKCg==</div>
+# some string cleaning
+names &lt;- gsub(&quot;\\s*\\([^)]*\\)&quot;, &quot;&quot;, promotors)  # remove everything between brackets rug/eur/etc.
+names &lt;- gsub(&quot;\\b(dr|prof)\\.?&quot;, &quot;&quot;, names, ignore.case = TRUE)  # remove dr and prof
+names &lt;- tolower(names)  #lower case
+names &lt;- trimws(gsub(&quot;\\s+&quot;, &quot; &quot;, names))  #trim any white spaces
+
+# some manual cleaning where my decision rukles don&#39;t work
+names &lt;- data.frame(names)
+colnames(names)[1] &lt;- &quot;name&quot;
+names$name &lt;- ifelse(names$name == &quot;need&quot;, &quot;a need&quot;, names$name)
+names$name &lt;- ifelse(names$name == &quot;kraaykamp&quot;, &quot;g kraaykamp&quot;, names$name)
+names$name &lt;- ifelse(names$name == &quot;a.flache&quot;, &quot;a. flache&quot;, names$name)
+names$name &lt;- ifelse(names$name == &quot;l.heyse&quot;, &quot;l. heyse&quot;, names$name)
+names$name &lt;- ifelse(names$name == &quot;r. veenstra (rug&quot;, &quot;r. veenstra&quot;, names$name)
+names$name &lt;- ifelse(names$name == &quot;j.slaets&quot;, &quot;j. slaets&quot;, names$name)
+names$name &lt;- ifelse(names$name == &quot;scheepers&quot;, &quot;p. scheepers&quot;, names$name)
+
+# now get the last names
+names &lt;- data.frame(names[!is.na(names$name), ])
+colnames(names)[1] &lt;- &quot;name&quot;
+names &lt;- names %&gt;%
+    mutate(last_name = word(name, -1))
+
+# get first initial
+names &lt;- names %&gt;%
+    mutate(first_letter = str_sub(name, 1, 1))
+
+# remove diacritics
+names$name_clean &lt;- stri_trans_general(names$last_name, &quot;Latin-ASCII&quot;)
+
+# paste firs tinitial last name together
+names$canon &lt;- paste0(names$first_letter, &quot;_&quot;, names$name_clean)
+
+# bind to unique strings in promotors 1-4
+promotors &lt;- data.frame(promotors)
+promotors &lt;- promotors[!is.na(promotors$promotors), ]
+promotors &lt;- data.frame(cbind(promotors, names[, c(&quot;canon&quot;)]))
+colnames(promotors)[2] &lt;- &quot;canon&quot;
+
+flextable(head(promotors))</code></pre>
+<div class="tabwid"><style>.cl-29682334{}.cl-295b9448{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-29640bb4{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-29643120{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2964312a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2964312b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing='true' class='cl-29682334'><thead><tr style="overflow-wrap:break-word;"><th class="cl-29643120"><p class="cl-29640bb4"><span class="cl-295b9448">promotors</span></p></th><th class="cl-29643120"><p class="cl-29640bb4"><span class="cl-295b9448">canon</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">S. Lindenberg (RUG)</span></p></td><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">s_lindenberg</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">R. Wippler (UU)</span></p></td><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">r_wippler</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">F. Tazelaar (UU)</span></p></td><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">f_tazelaar</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">J. Peschar (RUG)</span></p></td><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">j_peschar</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">T. Snijders (UU)</span></p></td><td class="cl-2964312a"><p class="cl-29640bb4"><span class="cl-295b9448">t_snijders</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-2964312b"><p class="cl-29640bb4"><span class="cl-295b9448">T. Snijders</span></p></td><td class="cl-2964312b"><p class="cl-29640bb4"><span class="cl-295b9448">t_snijders</span></p></td></tr></tbody></table></div>
+</div>
+<div id="edgelist-static" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Edgelist static</h1>
+<p>Create edgelists now that we have canonical names.</p>
+<pre class="r test"><code>edges &lt;- df[, c(&quot;Promotor.1&quot;, &quot;Promotor.2&quot;, &quot;Promotor.3&quot;, &quot;Promotor.4&quot;)]
+
+edges &lt;- left_join(edges, promotors, by = c(Promotor.1 = &quot;promotors&quot;))
+edges &lt;- left_join(edges, promotors, by = c(Promotor.2 = &quot;promotors&quot;))
+edges &lt;- left_join(edges, promotors, by = c(Promotor.3 = &quot;promotors&quot;))
+edges &lt;- left_join(edges, promotors, by = c(Promotor.4 = &quot;promotors&quot;))
+
+edges &lt;- edges[, c(&quot;canon.x&quot;, &quot;canon.y&quot;, &quot;canon.x.x&quot;, &quot;canon.y.y&quot;)]
+colnames(edges) &lt;- c(&quot;sup1&quot;, &quot;sup2&quot;, &quot;sup3&quot;, &quot;sup4&quot;)
+
+sup12 &lt;- edges[, c(1, 2)]
+sup12 &lt;- sup12 %&gt;%
+    filter(complete.cases(.))
+colnames(sup12) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+sup13 &lt;- edges[, c(1, 3)]
+sup13 &lt;- sup13 %&gt;%
+    filter(complete.cases(.))
+colnames(sup13) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+sup14 &lt;- edges[, c(1, 4)]
+sup14 &lt;- sup14 %&gt;%
+    filter(complete.cases(.))
+colnames(sup14) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+sup23 &lt;- edges[, c(2, 3)]
+sup23 &lt;- sup23 %&gt;%
+    filter(complete.cases(.))
+colnames(sup23) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+sup24 &lt;- edges[, c(2, 4)]
+sup24 &lt;- sup24 %&gt;%
+    filter(complete.cases(.))
+colnames(sup24) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+sup34 &lt;- edges[, c(3, 4)]
+sup34 &lt;- sup34 %&gt;%
+    filter(complete.cases(.))
+colnames(sup34) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+edgelist &lt;- rbind(sup12, sup13, sup14, sup23, sup24, sup34)
+nodes &lt;- c(edges[, c(&quot;sup1&quot;)], edges[, c(&quot;sup2&quot;)], edges[, c(&quot;sup3&quot;)], edges[, c(&quot;sup4&quot;)])
+nodes &lt;- data.frame(table(nodes))
+
+edgelist1 &lt;- edgelist %&gt;%
+    count(pmin(from, to), pmax(from, to))
+names(edgelist1)[1:2] &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+flextable(head(edgelist1))</code></pre>
+<div class="tabwid"><style>.cl-29940c7e{}.cl-298a8780{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-298df226{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-298df23a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-298e0d2e{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-298e0d42{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-298e0d43{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-298e0d4c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-298e0d56{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-298e0d57{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing='true' class='cl-29940c7e'><thead><tr style="overflow-wrap:break-word;"><th class="cl-298e0d2e"><p class="cl-298df226"><span class="cl-298a8780">from</span></p></th><th class="cl-298e0d2e"><p class="cl-298df226"><span class="cl-298a8780">to</span></p></th><th class="cl-298e0d42"><p class="cl-298df23a"><span class="cl-298a8780">n</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">a_bakker</span></p></td><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">p_groenwegen</span></p></td><td class="cl-298e0d4c"><p class="cl-298df23a"><span class="cl-298a8780">1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">a_bakker</span></p></td><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">s_lindenberg</span></p></td><td class="cl-298e0d4c"><p class="cl-298df23a"><span class="cl-298a8780">1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">a_borsboom</span></p></td><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">a_need</span></p></td><td class="cl-298e0d4c"><p class="cl-298df23a"><span class="cl-298a8780">1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">a_borsboom</span></p></td><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">w_ultee</span></p></td><td class="cl-298e0d4c"><p class="cl-298df23a"><span class="cl-298a8780">1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">a_doorne-huiseks</span></p></td><td class="cl-298e0d43"><p class="cl-298df226"><span class="cl-298a8780">s_lindenberg</span></p></td><td class="cl-298e0d4c"><p class="cl-298df23a"><span class="cl-298a8780">1</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-298e0d56"><p class="cl-298df226"><span class="cl-298a8780">a_doorne-huiskes</span></p></td><td class="cl-298e0d56"><p class="cl-298df226"><span class="cl-298a8780">h_boeije</span></p></td><td class="cl-298e0d57"><p class="cl-298df23a"><span class="cl-298a8780">1</span></p></td></tr></tbody></table></div>
+</div>
+<div id="nodes" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Nodes</h1>
+<p>And node characteristic: how many PhDs supervised.</p>
+<pre class="r test"><code>nodes &lt;- c(edges[, c(&quot;sup1&quot;)], edges[, c(&quot;sup2&quot;)], edges[, c(&quot;sup3&quot;)], edges[, c(&quot;sup4&quot;)])
+nodes &lt;- data.frame(table(nodes))</code></pre>
+</div>
+<div id="edgelists-dynamic" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Edgelists dynamic</h1>
+<pre class="r test"><code>edgesdyn &lt;- cbind(edges, df[, c(&quot;Promotiejaar&quot;)])
+colnames(edgesdyn)[5] &lt;- &quot;phd_year&quot;
+
+edgef &lt;- function(df, timemax, timemin) {
+
+    sups &lt;- edgesdyn[edgesdyn$phd_year &lt; timemax, ]
+    sups &lt;- sups[sups$phd_year &gt; timemin, ]
+    sups12 &lt;- sups[, c(1, 2)]
+    sups12 &lt;- sups12 %&gt;%
+        filter(complete.cases(.))
+    colnames(sups12) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    sups13 &lt;- sups[, c(1, 3)]
+    sups13 &lt;- sups13 %&gt;%
+        filter(complete.cases(.))
+    colnames(sups13) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    sups14 &lt;- sups[, c(1, 4)]
+    sups14 &lt;- sups14 %&gt;%
+        filter(complete.cases(.))
+    colnames(sups14) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    sups23 &lt;- sups[, c(2, 3)]
+    sups23 &lt;- sups23 %&gt;%
+        filter(complete.cases(.))
+    colnames(sups23) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    sups24 &lt;- sups[, c(2, 4)]
+    sups24 &lt;- sups24 %&gt;%
+        filter(complete.cases(.))
+    colnames(sups24) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    sups34 &lt;- sups[, c(3, 4)]
+    sups34 &lt;- sups34 %&gt;%
+        filter(complete.cases(.))
+    colnames(sups34) &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    edg &lt;- rbind(sups12, sups13, sups14, sups23, sups24, sups34)
+
+    edg &lt;- edg %&gt;%
+        count(pmin(from, to), pmax(from, to))
+    colnames(edg)[1:2] &lt;- c(&quot;from&quot;, &quot;to&quot;)
+
+    return(edg)
+
+}
+
+# we want: 1995-1999 2000-2004 2005-2009 2010-2014 2015-2019 2020-2025
+
+t1 &lt;- edgef(edgesdyn, 1995, 1989)
+t2 &lt;- edgef(edgesdyn, 2000, 1994)
+t3 &lt;- edgef(edgesdyn, 2005, 1999)
+t4 &lt;- edgef(edgesdyn, 2010, 2004)
+t5 &lt;- edgef(edgesdyn, 2015, 2009)
+t6 &lt;- edgef(edgesdyn, 2020, 2014)
+t7 &lt;- edgef(edgesdyn, 2026, 2019)</code></pre>
+</div>
+<div id="save" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Save</h1>
+<pre class="r test"><code>save(edgelist1, file = &quot;data/output_data/el_static.rda&quot;)
+save(t1, file = &quot;data/output_data/el_dyn1.rda&quot;)
+save(t2, file = &quot;data/output_data/el_dyn2.rda&quot;)
+save(t3, file = &quot;data/output_data/el_dyn3.rda&quot;)
+save(t4, file = &quot;data/output_data/el_dyn4.rda&quot;)
+save(t5, file = &quot;data/output_data/el_dyn5.rda&quot;)
+save(t6, file = &quot;data/output_data/el_dyn6.rda&quot;)
+save(t7, file = &quot;data/output_data/el_dyn7.rda&quot;)
+save(nodes, file = &quot;data/output_data/nodes_static.rda&quot;)</code></pre>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRGF0YSBjbGVhbmluZyIKI2JpYmxpb2dyYXBoeTogcmVmZXJlbmNlcy5iaWIKYXV0aG9yOiAiQmFzIEhvZnN0cmEiCi0tLQoKCgpgYGB7ciwgZ2xvYmFsc2V0dGluZ3MsIGVjaG89RkFMU0UsIHdhcm5pbmc9RkFMU0UsIHJlc3VsdHM9J2hpZGUnfQpsaWJyYXJ5KGtuaXRyKQoKa25pdHI6Om9wdHNfY2h1bmskc2V0KGVjaG8gPSBUUlVFKQpvcHRzX2NodW5rJHNldCh0aWR5Lm9wdHM9bGlzdCh3aWR0aC5jdXRvZmY9MTAwKSx0aWR5PVRSVUUsIHdhcm5pbmcgPSBGQUxTRSwgbWVzc2FnZSA9IEZBTFNFLGNvbW1lbnQgPSAiIz4iLCBjYWNoZT1UUlVFLCBjbGFzcy5zb3VyY2U9YygidGVzdCIpLCBjbGFzcy5vdXRwdXQ9YygidGVzdDIiKSkKb3B0aW9ucyh3aWR0aCA9IDEwMCkKcmdsOjpzZXR1cEtuaXRyKCkKCgoKY29sb3JpemUgPC0gZnVuY3Rpb24oeCwgY29sb3IpIHtzcHJpbnRmKCI8c3BhbiBzdHlsZT0nY29sb3I6ICVzOyc+JXM8L3NwYW4+IiwgY29sb3IsIHgpIH0KCmBgYAoKYGBge3Iga2xpcHB5LCBlY2hvPUZBTFNFLCBpbmNsdWRlPVRSVUV9CmtsaXBweTo6a2xpcHB5KHBvc2l0aW9uID0gYygndG9wJywgJ3JpZ2h0JykpCiNrbGlwcHk6OmtsaXBweShjb2xvciA9ICdkYXJrcmVkJykKI2tsaXBweTo6a2xpcHB5KHRvb2x0aXBfbWVzc2FnZSA9ICdDbGljayB0byBjb3B5JywgdG9vbHRpcF9zdWNjZXNzID0gJ0RvbmUnKQpgYGAKCkxhc3QgY29tcGlsZWQgb24gYHIgZm9ybWF0KFN5cy50aW1lKCksICclQiwgJVknKWAKCjxicj4KCi0tLS0KICAKIyBQYWNrYWdlcwoKU29tZSBwYWNrYWdlcyBuZWNlc3NhcnkgdG8gcnVuIHRoZSBhbmFseXNlcy4KCmBgYHtyIHBhY2thZ2VzfQpybShsaXN0ID0gbHMoKSkKbGlicmFyeSgiZ3JvdW5kaG9nIikKZ3JvdW5kaG9nLmxpYnJhcnkoIgogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCdvcGVueGxzeCcpCiAgICAgICAgICAgICAgICAgIGxpYnJhcnkoJ2ZsZXh0YWJsZScpCiAgICAgICAgICAgICAgICAgIGxpYnJhcnkoJ2RwbHlyJykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgnc3RyaW5nZGlzdCcpCiAgICAgICAgICAgICAgICAgIGxpYnJhcnkoJ3N0cmluZ2knKQogICAgICAgICAgICAgICAgICBsaWJyYXJ5KCdzdHJpbmdyJykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgnZ2dyYXBoJykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgndGlkeWdyYXBoJykKICAgICAgICAgICAgICAgICAgbGlicmFyeSgnaWdyYXBoJykKICAgICAgICAgICAgICAgICAgIiwgCiAgICAgICAgICAgICAgICAgICIyMDI1LTA0LTEwIikKYGBgCiMgRGF0YQoKTG9hZCB0aGUgZGF0YSwgc2hvdyB3aGF0IGl0IGxvb2tzIGxpa2UuCgpgYGB7ciBkYXRhbG9hZGluZ30KZGYgPC0gcmVhZC54bHN4KCJkYXRhL2lucHV0X2RhdGEvSUNTX2FsdW1uaV9KYW4yOF8yMDI2X2Jhcy54bHN4IikKZmxleHRhYmxlKGhlYWQoZGYpKQpgYGAKCiMgQ2xlYW5pbmcKClNvbWUgc3RyaW5nIGNsZWFuaW5nIG9mIHN1cGVydmlzb3JzLCBtb3N0IGxpa2VseSBzdGlsbCBjb250YWlucyBlcnJvcnMsIGJ1dCB0aGlzIGlzIGFscmVhZHkgcHJldHR5IGludm9sdmVkLgoKCmBgYHtyIGRhdGFjbGVhbmluZ30KIyBmaXJzdCBnZXQgdGhlIGFwcGVuZGVkIGxpc3Qgb2YgYWxsIHVuaXF1ZSBzdHJpbmdzIGluIHByb21vdG9yIDEtNApwcm9tb3RvcnMgPC0gICAgIHVuaXF1ZShjKGRmWywgYygiUHJvbW90b3IuMSIpXSwKICAgICAgICAgICAgICAgICAgICBkZlssIGMoIlByb21vdG9yLjIiKV0sCiAgICAgICAgICAgICAgICAgICAgZGZbLCBjKCJQcm9tb3Rvci4zIildLAogICAgICAgICAgICAgICAgICAgIGRmWywgYygiUHJvbW90b3IuNCIpXSkpCgojIHNvbWUgc3RyaW5nIGNsZWFuaW5nCm5hbWVzIDwtIGdzdWIoIlxccypcXChbXildKlxcKSIsICIiLCBwcm9tb3RvcnMpICMgcmVtb3ZlIGV2ZXJ5dGhpbmcgYmV0d2VlbiBicmFja2V0cyBydWcvZXVyL2V0Yy4KbmFtZXMgPC0gZ3N1YigiXFxiKGRyfHByb2YpXFwuPyIsICIiLCBuYW1lcywgaWdub3JlLmNhc2UgPSBUUlVFKSAjIHJlbW92ZSBkciBhbmQgcHJvZgpuYW1lcyA8LSB0b2xvd2VyKG5hbWVzKSAjbG93ZXIgY2FzZQpuYW1lcyA8LSB0cmltd3MoZ3N1YigiXFxzKyIsICIgIiwgbmFtZXMpKSAjdHJpbSBhbnkgd2hpdGUgc3BhY2VzCgojIHNvbWUgbWFudWFsIGNsZWFuaW5nIHdoZXJlIG15IGRlY2lzaW9uIHJ1a2xlcyBkb24ndCB3b3JrCm5hbWVzIDwtIGRhdGEuZnJhbWUobmFtZXMpCmNvbG5hbWVzKG5hbWVzKVsxXSA8LSAibmFtZSIKbmFtZXMkbmFtZSA8LSBpZmVsc2UobmFtZXMkbmFtZSA9PSAibmVlZCIsICJhIG5lZWQiLCBuYW1lcyRuYW1lKQpuYW1lcyRuYW1lIDwtIGlmZWxzZShuYW1lcyRuYW1lID09ICJrcmFheWthbXAiLCAiZyBrcmFheWthbXAiLCBuYW1lcyRuYW1lKQpuYW1lcyRuYW1lIDwtIGlmZWxzZShuYW1lcyRuYW1lID09ICJhLmZsYWNoZSIsICJhLiBmbGFjaGUiLCBuYW1lcyRuYW1lKQpuYW1lcyRuYW1lIDwtIGlmZWxzZShuYW1lcyRuYW1lID09ICJsLmhleXNlIiwgImwuIGhleXNlIiwgbmFtZXMkbmFtZSkKbmFtZXMkbmFtZSA8LSBpZmVsc2UobmFtZXMkbmFtZSA9PSAici4gdmVlbnN0cmEgKHJ1ZyIsICJyLiB2ZWVuc3RyYSIsIG5hbWVzJG5hbWUpCm5hbWVzJG5hbWUgPC0gaWZlbHNlKG5hbWVzJG5hbWUgPT0gImouc2xhZXRzIiwgImouIHNsYWV0cyIsIG5hbWVzJG5hbWUpCm5hbWVzJG5hbWUgPC0gaWZlbHNlKG5hbWVzJG5hbWUgPT0gInNjaGVlcGVycyIsICJwLiBzY2hlZXBlcnMiLCBuYW1lcyRuYW1lKQoKIyBub3cgZ2V0IHRoZSBsYXN0IG5hbWVzCm5hbWVzIDwtIGRhdGEuZnJhbWUobmFtZXNbIWlzLm5hKG5hbWVzJG5hbWUpLCBdKQpjb2xuYW1lcyhuYW1lcylbMV0gPC0gIm5hbWUiCm5hbWVzIDwtIG5hbWVzICU+JQogIG11dGF0ZShsYXN0X25hbWUgPSB3b3JkKG5hbWUsIC0xKSkKCiMgZ2V0IGZpcnN0IGluaXRpYWwKbmFtZXMgPC0gbmFtZXMgJT4lCiAgbXV0YXRlKGZpcnN0X2xldHRlciA9IHN0cl9zdWIobmFtZSwgMSwgMSkpCgojIHJlbW92ZSBkaWFjcml0aWNzCm5hbWVzJG5hbWVfY2xlYW4gPC0gc3RyaV90cmFuc19nZW5lcmFsKG5hbWVzJGxhc3RfbmFtZSwgIkxhdGluLUFTQ0lJIikKCiMgcGFzdGUgZmlycyB0aW5pdGlhbCBsYXN0IG5hbWUgdG9nZXRoZXIKbmFtZXMkY2Fub24gPC0gcGFzdGUwKG5hbWVzJGZpcnN0X2xldHRlciwgIl8iLCBuYW1lcyRuYW1lX2NsZWFuKQoKIyBiaW5kIHRvIHVuaXF1ZSBzdHJpbmdzIGluIHByb21vdG9ycyAxLTQKcHJvbW90b3JzIDwtIGRhdGEuZnJhbWUocHJvbW90b3JzKQpwcm9tb3RvcnMgPC0gcHJvbW90b3JzWyFpcy5uYShwcm9tb3RvcnMkcHJvbW90b3JzKSwgXQpwcm9tb3RvcnMgPC0gZGF0YS5mcmFtZShjYmluZChwcm9tb3RvcnMsIG5hbWVzWywgYygiY2Fub24iKV0pKQpjb2xuYW1lcyhwcm9tb3RvcnMpWzJdIDwtICJjYW5vbiIKCmZsZXh0YWJsZShoZWFkKHByb21vdG9ycykpCmBgYAoKIyBFZGdlbGlzdCBzdGF0aWMKCkNyZWF0ZSBlZGdlbGlzdHMgbm93IHRoYXQgd2UgaGF2ZSBjYW5vbmljYWwgbmFtZXMuCgpgYGB7ciBlZGdlbGlzdHN9CgplZGdlcyA8LSBkZlssIGMoIlByb21vdG9yLjEiLCAiUHJvbW90b3IuMiIsICJQcm9tb3Rvci4zIiwgIlByb21vdG9yLjQiKV0KCmVkZ2VzIDwtIGxlZnRfam9pbihlZGdlcywgcHJvbW90b3JzLCBieSA9IGMoIlByb21vdG9yLjEiID0gInByb21vdG9ycyIpKQplZGdlcyA8LSBsZWZ0X2pvaW4oZWRnZXMsIHByb21vdG9ycywgYnkgPSBjKCJQcm9tb3Rvci4yIiA9ICJwcm9tb3RvcnMiKSkKZWRnZXMgPC0gbGVmdF9qb2luKGVkZ2VzLCBwcm9tb3RvcnMsIGJ5ID0gYygiUHJvbW90b3IuMyIgPSAicHJvbW90b3JzIikpCmVkZ2VzIDwtIGxlZnRfam9pbihlZGdlcywgcHJvbW90b3JzLCBieSA9IGMoIlByb21vdG9yLjQiID0gInByb21vdG9ycyIpKQoKZWRnZXMgPC0gZWRnZXNbLCBjKCJjYW5vbi54IiwgImNhbm9uLnkiLCAiY2Fub24ueC54IiwgImNhbm9uLnkueSIpXQpjb2xuYW1lcyhlZGdlcykgPC0gYygic3VwMSIsICJzdXAyIiwgInN1cDMiLCAic3VwNCIpCgpzdXAxMiA8LSBlZGdlc1ssIGMoMSwgMildCnN1cDEyIDwtIHN1cDEyICU+JSBmaWx0ZXIoY29tcGxldGUuY2FzZXMoLikpCmNvbG5hbWVzKHN1cDEyKSA8LSBjKCJmcm9tIiwgInRvIikKCnN1cDEzIDwtIGVkZ2VzWywgYygxLCAzKV0Kc3VwMTMgPC0gc3VwMTMgJT4lIGZpbHRlcihjb21wbGV0ZS5jYXNlcyguKSkKY29sbmFtZXMoc3VwMTMpIDwtIGMoImZyb20iLCAidG8iKQoKc3VwMTQgPC0gZWRnZXNbLCBjKDEsIDQpXQpzdXAxNCA8LSBzdXAxNCAlPiUgZmlsdGVyKGNvbXBsZXRlLmNhc2VzKC4pKQpjb2xuYW1lcyhzdXAxNCkgPC0gYygiZnJvbSIsICJ0byIpCgpzdXAyMyA8LSBlZGdlc1ssIGMoMiwgMyldCnN1cDIzIDwtIHN1cDIzICU+JSBmaWx0ZXIoY29tcGxldGUuY2FzZXMoLikpCmNvbG5hbWVzKHN1cDIzKSA8LSBjKCJmcm9tIiwgInRvIikKCnN1cDI0IDwtIGVkZ2VzWywgYygyLCA0KV0Kc3VwMjQgPC0gc3VwMjQgJT4lIGZpbHRlcihjb21wbGV0ZS5jYXNlcyguKSkKY29sbmFtZXMoc3VwMjQpIDwtIGMoImZyb20iLCAidG8iKQoKc3VwMzQgPC0gZWRnZXNbLCBjKDMsIDQpXQpzdXAzNCA8LSBzdXAzNCAlPiUgZmlsdGVyKGNvbXBsZXRlLmNhc2VzKC4pKQpjb2xuYW1lcyhzdXAzNCkgPC0gYygiZnJvbSIsICJ0byIpCgplZGdlbGlzdCA8LSByYmluZChzdXAxMiwgc3VwMTMsIHN1cDE0LCBzdXAyMywgc3VwMjQsIHN1cDM0KQpub2RlcyA8LSBjKGVkZ2VzWywgYygic3VwMSIpXSwgZWRnZXNbLCBjKCJzdXAyIildLCBlZGdlc1ssIGMoInN1cDMiKV0sIGVkZ2VzWywgYygic3VwNCIpXSkKbm9kZXMgPC0gZGF0YS5mcmFtZSh0YWJsZShub2RlcykpCgplZGdlbGlzdDEgPC0gZWRnZWxpc3QgJT4lCiAgICAgICAgY291bnQocG1pbihmcm9tLCB0byksIHBtYXgoZnJvbSwgdG8pKQpuYW1lcyhlZGdlbGlzdDEpWzE6Ml0gPC0gYygiZnJvbSIsICJ0byIpCgpmbGV4dGFibGUoaGVhZChlZGdlbGlzdDEpKQoKYGBgCgojIE5vZGVzCgpBbmQgbm9kZSBjaGFyYWN0ZXJpc3RpYzogaG93IG1hbnkgUGhEcyBzdXBlcnZpc2VkLgoKYGBge3Igbm9kZXN9Cgpub2RlcyA8LSBjKGVkZ2VzWywgYygic3VwMSIpXSwgZWRnZXNbLCBjKCJzdXAyIildLCBlZGdlc1ssIGMoInN1cDMiKV0sIGVkZ2VzWywgYygic3VwNCIpXSkKbm9kZXMgPC0gZGF0YS5mcmFtZSh0YWJsZShub2RlcykpCgpgYGAKCiMgRWRnZWxpc3RzIGR5bmFtaWMKCmBgYHtyIGVkZ2VzZHluYW1pY30KCmVkZ2VzZHluIDwtIGNiaW5kKGVkZ2VzLCBkZlssIGMoIlByb21vdGllamFhciIpXSkKY29sbmFtZXMoZWRnZXNkeW4pWzVdIDwtICJwaGRfeWVhciIKCmVkZ2VmIDwtIGZ1bmN0aW9uKGRmLCB0aW1lbWF4LCB0aW1lbWluKSB7CiAgCiAgc3VwcyA8LSBlZGdlc2R5bltlZGdlc2R5biRwaGRfeWVhciA8IHRpbWVtYXgsIF0KICBzdXBzIDwtIHN1cHNbc3VwcyRwaGRfeWVhciA+IHRpbWVtaW4sIF0KICBzdXBzMTIgPC0gc3Vwc1ssIGMoMSwgMildCiAgc3VwczEyIDwtIHN1cHMxMiAlPiUgZmlsdGVyKGNvbXBsZXRlLmNhc2VzKC4pKQogIGNvbG5hbWVzKHN1cHMxMikgPC0gYygiZnJvbSIsICJ0byIpCiAgCiAgc3VwczEzIDwtIHN1cHNbLCBjKDEsIDMpXQogIHN1cHMxMyA8LSBzdXBzMTMgJT4lIGZpbHRlcihjb21wbGV0ZS5jYXNlcyguKSkKICBjb2xuYW1lcyhzdXBzMTMpIDwtIGMoImZyb20iLCAidG8iKQogIAogIHN1cHMxNCA8LSBzdXBzWywgYygxLCA0KV0KICBzdXBzMTQgPC0gc3VwczE0ICU+JSBmaWx0ZXIoY29tcGxldGUuY2FzZXMoLikpCiAgY29sbmFtZXMoc3VwczE0KSA8LSBjKCJmcm9tIiwgInRvIikKICAKICBzdXBzMjMgPC0gc3Vwc1ssIGMoMiwgMyldCiAgc3VwczIzIDwtIHN1cHMyMyAlPiUgZmlsdGVyKGNvbXBsZXRlLmNhc2VzKC4pKQogIGNvbG5hbWVzKHN1cHMyMykgPC0gYygiZnJvbSIsICJ0byIpCiAgCiAgc3VwczI0IDwtIHN1cHNbLCBjKDIsIDQpXQogIHN1cHMyNCA8LSBzdXBzMjQgJT4lIGZpbHRlcihjb21wbGV0ZS5jYXNlcyguKSkKICBjb2xuYW1lcyhzdXBzMjQpIDwtIGMoImZyb20iLCAidG8iKQogIAogIHN1cHMzNCA8LSBzdXBzWywgYygzLCA0KV0KICBzdXBzMzQgPC0gc3VwczM0ICU+JSBmaWx0ZXIoY29tcGxldGUuY2FzZXMoLikpCiAgY29sbmFtZXMoc3VwczM0KSA8LSBjKCJmcm9tIiwgInRvIikKICAKICBlZGcgPC0gcmJpbmQoc3VwczEyLCBzdXBzMTMsIHN1cHMxNCwgc3VwczIzLCBzdXBzMjQsIHN1cHMzNCkKICAKICBlZGcgPC0gZWRnICU+JQogICAgICAgIGNvdW50KHBtaW4oZnJvbSwgdG8pLCBwbWF4KGZyb20sIHRvKSkKICBjb2xuYW1lcyhlZGcpWzE6Ml0gPC0gYygiZnJvbSIsICJ0byIpCiAgCiAgcmV0dXJuKGVkZykKICAKfQoKIyB3ZSB3YW50OgojIDE5OTUtMTk5OQojIDIwMDAtMjAwNAojIDIwMDUtMjAwOQojIDIwMTAtMjAxNAojIDIwMTUtMjAxOQojIDIwMjAtMjAyNQoKdDEgPC0gZWRnZWYoZWRnZXNkeW4sIDE5OTUsIDE5ODkpCnQyIDwtIGVkZ2VmKGVkZ2VzZHluLCAyMDAwLCAxOTk0KQp0MyA8LSBlZGdlZihlZGdlc2R5biwgMjAwNSwgMTk5OSkKdDQgPC0gZWRnZWYoZWRnZXNkeW4sIDIwMTAsIDIwMDQpCnQ1IDwtIGVkZ2VmKGVkZ2VzZHluLCAyMDE1LCAyMDA5KQp0NiA8LSBlZGdlZihlZGdlc2R5biwgMjAyMCwgMjAxNCkKdDcgPC0gZWRnZWYoZWRnZXNkeW4sIDIwMjYsIDIwMTkpCgoKYGBgCgojIFNhdmUKCmBgYHtyIHNhdmUgREZzfQoKc2F2ZShlZGdlbGlzdDEsIGZpbGUgPSAiZGF0YS9vdXRwdXRfZGF0YS9lbF9zdGF0aWMucmRhIikKc2F2ZSh0MSwgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjEucmRhIikKc2F2ZSh0MiwgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjIucmRhIikKc2F2ZSh0MywgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjMucmRhIikKc2F2ZSh0NCwgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjQucmRhIikKc2F2ZSh0NSwgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjUucmRhIikKc2F2ZSh0NiwgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjYucmRhIikKc2F2ZSh0NywgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL2VsX2R5bjcucmRhIikKc2F2ZShub2RlcywgZmlsZSA9ICJkYXRhL291dHB1dF9kYXRhL25vZGVzX3N0YXRpYy5yZGEiKQoKYGBgCgo=</div>
 
 
 </div>
