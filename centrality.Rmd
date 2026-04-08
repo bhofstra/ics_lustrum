@@ -1,0 +1,110 @@
+---
+title: "Centrality"
+author: "Bas Hofstra"
+---
+
+
+
+```{r, globalsettings, echo=FALSE, warning=FALSE, results='hide'}
+library(knitr)
+
+knitr::opts_chunk$set(echo = TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE, warning = FALSE, message = FALSE,comment = "#>", cache=TRUE, class.source=c("test"), class.output=c("test2"))
+options(width = 100)
+rgl::setupKnitr()
+
+
+
+colorize <- function(x, color) {sprintf("<span style='color: %s;'>%s</span>", color, x) }
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+#klippy::klippy(color = 'darkred')
+#klippy::klippy(tooltip_message = 'Click to copy', tooltip_success = 'Done')
+```
+
+Last compiled on `r format(Sys.time(), '%B, %Y')`
+
+<br>
+
+
+
+
+Some packages necessary to run the analyses.
+
+```{r packages}
+rm(list = ls())
+library("groundhog")
+groundhog.library("
+                  library('openxlsx')
+                  library('flextable')
+                  library('dplyr')
+                  library('stringdist')
+                  library('stringi')
+                  library('stringr')
+                  library('ggraph')
+                  library('tidygraph')
+                  library('igraph')
+                  library('visNetwork')
+                  library('gganimate')
+                  library('shiny')
+                  ", 
+                  "2025-04-10")
+
+```
+
+# Data
+
+Load the output data we generated before
+
+```{r dataloading}
+load("data/output_data/el_static.rda")
+load("data/output_data/nodes_static.rda")
+load("data/output_data/el_dyn1.rda")
+load("data/output_data/el_dyn2.rda")
+load("data/output_data/el_dyn3.rda")
+load("data/output_data/el_dyn4.rda")
+load("data/output_data/el_dyn5.rda")
+load("data/output_data/el_dyn6.rda")
+load("data/output_data/el_dyn7.rda")
+
+```
+
+# Standard Viz + centrality
+
+Some starting viz, and info on centrality.
+
+```{r centrality}
+
+# gen graph
+g <- graph_from_data_frame(edgelist1, directed = FALSE)
+
+# add node characteristics fecundity (how many phds)
+head(V(g)$name)
+colnames(nodes)[1] <- "name"
+V(g)$fec <- nodes$Freq[match(V(g)$name, nodes$name)]
+head(V(g)$fec)
+
+GraphVertices <- V(g)   
+
+# Degree
+degrees <- as.data.frame(degree(g, v = GraphVertices, normalized = FALSE))
+colnames(degrees)[1] <- "degree"
+degrees$name <- rownames(degrees)
+degrees <- data.frame(degrees[order(-degrees$degree), ])
+
+flextable(degrees)
+
+# Betweenness
+between <- as.data.frame(betweenness(g, v = GraphVertices,    
+                                    directed = FALSE, normalized = TRUE))
+colnames(between)[1] <- "betweenness"
+between$name <- rownames(between)
+between <- data.frame(between[order(-between$betweenness), ])
+
+
+flextable(between)
+```
+

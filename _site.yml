@@ -21,7 +21,10 @@ navbar:
       - text: "Genealogy Viz"
         href: genea.html
         # here, other .Rmds can be added
-
+    - text: "Centrality"
+      menu:
+      - text: "Centrality"
+        href: centrality.html
 
 
   right:
