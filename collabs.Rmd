@@ -1,6 +1,5 @@
 ---
 title: "Collabs Viz"
-#bibliography: references.bib
 author: "Bas Hofstra"
 ---
 
@@ -73,9 +72,9 @@ load("data/output_data/el_dyn7.rda")
 
 ```
 
-# Standard Viz
+# Standard Viz + centrality
 
-Some starting viz.
+Some starting viz, and info on centrality.
 
 ```{r viz_static}
 
@@ -87,22 +86,6 @@ head(V(g)$name)
 colnames(nodes)[1] <- "name"
 V(g)$fec <- nodes$Freq[match(V(g)$name, nodes$name)]
 head(V(g)$fec)
-
-GraphVertices <- V(g)   
-
-degrees <- as.data.frame(degree(g, v = GraphVertices, normalized = FALSE))
-colnames(degrees)[1] <- "degree"
-degrees$name <- rownames(degrees)
-degrees <- data.frame(degrees[order(-degrees$degree), ])
-head(degrees)
-
-between <- as.data.frame(betweenness(g, v = GraphVertices,    
-                                    directed = FALSE, normalized = TRUE))
-colnames(between)[1] <- "betweenness"
-between$name <- rownames(between)
-between <- data.frame(between[order(-between$betweenness), ])
-head(between)
-
 
 
 # generate the graph
