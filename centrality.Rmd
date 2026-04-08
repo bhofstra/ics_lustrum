@@ -106,5 +106,16 @@ between <- data.frame(between[order(-between$betweenness), ])
 
 
 flextable(between)
+
+
+# closeness
+closeness <- as.data.frame(closeness(g, v = GraphVertices,    
+                                    normalized = TRUE))
+colnames(closeness)[1] <- "closeness"
+closeness$name <- rownames(closeness)
+closeness <- data.frame(closeness[order(-closeness$closeness), ])
+
+
+flextable(closeness)
 ```
 

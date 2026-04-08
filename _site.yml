@@ -21,7 +21,7 @@ navbar:
         # here, other .Rmds can be added
     - text: "Centrality"
       menu:
-      - text: "Degree and betweenness"
+      - text: "Standard metrics"
         href: centrality.html
 
 
