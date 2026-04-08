@@ -72,7 +72,7 @@ load("data/output_data/el_dyn7.rda")
 
 ```
 
-# Standard Viz + centrality
+# Some standard centrality metrics
 
 Some starting viz, and info on centrality.
 
