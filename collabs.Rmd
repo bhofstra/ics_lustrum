@@ -175,7 +175,7 @@ visNetwork(nodes, edges, height = "1000px", width = "100%") %>%
 
 # Dynamic viz
 
-```{r viz_dyn}
+```{r viz_dyn, eval=FALSE}
 
 edges_all <- bind_rows(
   t1 %>% mutate(time = "t1"),

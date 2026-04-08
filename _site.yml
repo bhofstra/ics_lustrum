@@ -18,12 +18,10 @@ navbar:
       menu:
       - text: "Collabs Viz"
         href: collabs.html
-      - text: "Genealogy Viz"
-        href: genea.html
         # here, other .Rmds can be added
     - text: "Centrality"
       menu:
-      - text: "Centrality"
+      - text: "Degree and betweenness"
         href: centrality.html
 
 
